@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Caption Bounce (16:9)">
+  <rect width="480" height="270" fill="#0E0E10"/>
+  <g><animateTransform attributeName="transform" type="translate" values="0 8;0 0;0 8" dur="2s" repeatCount="indefinite"/>
+      <rect x="96" y="202.5" width="288" height="32.4" rx="6" fill="#1A1A1A" opacity="0.75"/>
+      <text x="240" y="224.1" text-anchor="middle" fill="#fff" font-family="Segoe UI, sans-serif" font-size="18.24">Caption Bounce</text>
+    </g>
+  <text x="8" y="262" fill="#666" font-size="9" font-family="monospace">mm-cap-bounce-16x9</text>
+</svg>

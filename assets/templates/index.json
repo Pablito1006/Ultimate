@@ -1,0 +1,952 @@
+{
+  "version": 1,
+  "generatedAt": "deterministic",
+  "designCount": 59,
+  "templateCount": 118,
+  "templates": [
+    {
+      "id": "mm-cinema-mask-reveal-16x9",
+      "name": "Mask Reveal Title (16:9)",
+      "category": "Cinema Titles",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-mask-reveal-16x9/template.json"
+    },
+    {
+      "id": "mm-cinema-mask-reveal-9x16",
+      "name": "Mask Reveal Title (9:16)",
+      "category": "Cinema Titles",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-mask-reveal-9x16/template.json"
+    },
+    {
+      "id": "mm-cinema-stroke-draw-16x9",
+      "name": "Stroke Draw Title (16:9)",
+      "category": "Cinema Titles",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-stroke-draw-16x9/template.json"
+    },
+    {
+      "id": "mm-cinema-stroke-draw-9x16",
+      "name": "Stroke Draw Title (9:16)",
+      "category": "Cinema Titles",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-stroke-draw-9x16/template.json"
+    },
+    {
+      "id": "mm-cinema-split-vertical-16x9",
+      "name": "Vertical Split Title (16:9)",
+      "category": "Cinema Titles",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-split-vertical-16x9/template.json"
+    },
+    {
+      "id": "mm-cinema-split-vertical-9x16",
+      "name": "Vertical Split Title (9:16)",
+      "category": "Cinema Titles",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-split-vertical-9x16/template.json"
+    },
+    {
+      "id": "mm-cinema-blur-to-sharp-16x9",
+      "name": "Blur to Sharp (16:9)",
+      "category": "Cinema Titles",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-blur-to-sharp-16x9/template.json"
+    },
+    {
+      "id": "mm-cinema-blur-to-sharp-9x16",
+      "name": "Blur to Sharp (9:16)",
+      "category": "Cinema Titles",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-blur-to-sharp-9x16/template.json"
+    },
+    {
+      "id": "mm-cinema-offset-shadow-16x9",
+      "name": "Offset Shadow Letters (16:9)",
+      "category": "Cinema Titles",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-offset-shadow-16x9/template.json"
+    },
+    {
+      "id": "mm-cinema-offset-shadow-9x16",
+      "name": "Offset Shadow Letters (9:16)",
+      "category": "Cinema Titles",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-offset-shadow-9x16/template.json"
+    },
+    {
+      "id": "mm-cinema-film-credit-16x9",
+      "name": "Film Credit Roll (16:9)",
+      "category": "Cinema Titles",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-film-credit-16x9/template.json"
+    },
+    {
+      "id": "mm-cinema-film-credit-9x16",
+      "name": "Film Credit Roll (9:16)",
+      "category": "Cinema Titles",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cinema-film-credit-9x16/template.json"
+    },
+    {
+      "id": "mm-lt-slide-bar-16x9",
+      "name": "Slide Bar Lower Third (16:9)",
+      "category": "Lower Thirds",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-lt-slide-bar-16x9/template.json"
+    },
+    {
+      "id": "mm-lt-slide-bar-9x16",
+      "name": "Slide Bar Lower Third (9:16)",
+      "category": "Lower Thirds",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-lt-slide-bar-9x16/template.json"
+    },
+    {
+      "id": "mm-lt-rounded-block-16x9",
+      "name": "Rounded Block LT (16:9)",
+      "category": "Lower Thirds",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-lt-rounded-block-16x9/template.json"
+    },
+    {
+      "id": "mm-lt-rounded-block-9x16",
+      "name": "Rounded Block LT (9:16)",
+      "category": "Lower Thirds",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-lt-rounded-block-9x16/template.json"
+    },
+    {
+      "id": "mm-lt-typewriter-16x9",
+      "name": "Typewriter Line LT (16:9)",
+      "category": "Lower Thirds",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-lt-typewriter-16x9/template.json"
+    },
+    {
+      "id": "mm-lt-typewriter-9x16",
+      "name": "Typewriter Line LT (9:16)",
+      "category": "Lower Thirds",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-lt-typewriter-9x16/template.json"
+    },
+    {
+      "id": "mm-lt-floating-tag-16x9",
+      "name": "Floating Tag LT (16:9)",
+      "category": "Lower Thirds",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-lt-floating-tag-16x9/template.json"
+    },
+    {
+      "id": "mm-lt-floating-tag-9x16",
+      "name": "Floating Tag LT (9:16)",
+      "category": "Lower Thirds",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-lt-floating-tag-9x16/template.json"
+    },
+    {
+      "id": "mm-lt-social-16x9",
+      "name": "Social Lower Third (16:9)",
+      "category": "Lower Thirds",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-lt-social-16x9/template.json"
+    },
+    {
+      "id": "mm-lt-social-9x16",
+      "name": "Social Lower Third (9:16)",
+      "category": "Lower Thirds",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-lt-social-9x16/template.json"
+    },
+    {
+      "id": "mm-lt-dual-logo-16x9",
+      "name": "Dual Line + Logo LT (16:9)",
+      "category": "Lower Thirds",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-lt-dual-logo-16x9/template.json"
+    },
+    {
+      "id": "mm-lt-dual-logo-9x16",
+      "name": "Dual Line + Logo LT (9:16)",
+      "category": "Lower Thirds",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-lt-dual-logo-9x16/template.json"
+    },
+    {
+      "id": "mm-lt-minimal-16x9",
+      "name": "Minimal Lower Third (16:9)",
+      "category": "Lower Thirds",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-lt-minimal-16x9/template.json"
+    },
+    {
+      "id": "mm-lt-minimal-9x16",
+      "name": "Minimal Lower Third (9:16)",
+      "category": "Lower Thirds",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-lt-minimal-9x16/template.json"
+    },
+    {
+      "id": "mm-lt-multi-guest-16x9",
+      "name": "Multi-Guest Interview LT (16:9)",
+      "category": "Lower Thirds",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-lt-multi-guest-16x9/template.json"
+    },
+    {
+      "id": "mm-lt-multi-guest-9x16",
+      "name": "Multi-Guest Interview LT (9:16)",
+      "category": "Lower Thirds",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-lt-multi-guest-9x16/template.json"
+    },
+    {
+      "id": "mm-kt-word-scale-16x9",
+      "name": "Word Scale Kinetic (16:9)",
+      "category": "Kinetic Typography",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-kt-word-scale-16x9/template.json"
+    },
+    {
+      "id": "mm-kt-word-scale-9x16",
+      "name": "Word Scale Kinetic (9:16)",
+      "category": "Kinetic Typography",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-kt-word-scale-9x16/template.json"
+    },
+    {
+      "id": "mm-kt-stack-phrase-16x9",
+      "name": "Stacking Phrase (16:9)",
+      "category": "Kinetic Typography",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-kt-stack-phrase-16x9/template.json"
+    },
+    {
+      "id": "mm-kt-stack-phrase-9x16",
+      "name": "Stacking Phrase (9:16)",
+      "category": "Kinetic Typography",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-kt-stack-phrase-9x16/template.json"
+    },
+    {
+      "id": "mm-kt-flip-words-16x9",
+      "name": "Flip Words (16:9)",
+      "category": "Kinetic Typography",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-kt-flip-words-16x9/template.json"
+    },
+    {
+      "id": "mm-kt-flip-words-9x16",
+      "name": "Flip Words (9:16)",
+      "category": "Kinetic Typography",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-kt-flip-words-9x16/template.json"
+    },
+    {
+      "id": "mm-kt-geo-text-16x9",
+      "name": "Text on Geometry (16:9)",
+      "category": "Kinetic Typography",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-kt-geo-text-16x9/template.json"
+    },
+    {
+      "id": "mm-kt-geo-text-9x16",
+      "name": "Text on Geometry (9:16)",
+      "category": "Kinetic Typography",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-kt-geo-text-9x16/template.json"
+    },
+    {
+      "id": "mm-kt-counter-16x9",
+      "name": "Animated Counter (16:9)",
+      "category": "Kinetic Typography",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-kt-counter-16x9/template.json"
+    },
+    {
+      "id": "mm-kt-counter-9x16",
+      "name": "Animated Counter (9:16)",
+      "category": "Kinetic Typography",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-kt-counter-9x16/template.json"
+    },
+    {
+      "id": "mm-kt-quote-big-16x9",
+      "name": "Big Quote (16:9)",
+      "category": "Kinetic Typography",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-kt-quote-big-16x9/template.json"
+    },
+    {
+      "id": "mm-kt-quote-big-9x16",
+      "name": "Big Quote (9:16)",
+      "category": "Kinetic Typography",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-kt-quote-big-9x16/template.json"
+    },
+    {
+      "id": "mm-tr-shape-wipe-16x9",
+      "name": "Shape Wipe (16:9)",
+      "category": "Transitions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-tr-shape-wipe-16x9/template.json"
+    },
+    {
+      "id": "mm-tr-shape-wipe-9x16",
+      "name": "Shape Wipe (9:16)",
+      "category": "Transitions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-tr-shape-wipe-9x16/template.json"
+    },
+    {
+      "id": "mm-tr-liquid-16x9",
+      "name": "Liquid Wipe (16:9)",
+      "category": "Transitions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-tr-liquid-16x9/template.json"
+    },
+    {
+      "id": "mm-tr-liquid-9x16",
+      "name": "Liquid Wipe (9:16)",
+      "category": "Transitions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-tr-liquid-9x16/template.json"
+    },
+    {
+      "id": "mm-tr-slide-blur-16x9",
+      "name": "Slide + Blur (16:9)",
+      "category": "Transitions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-tr-slide-blur-16x9/template.json"
+    },
+    {
+      "id": "mm-tr-slide-blur-9x16",
+      "name": "Slide + Blur (9:16)",
+      "category": "Transitions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-tr-slide-blur-9x16/template.json"
+    },
+    {
+      "id": "mm-tr-circle-mask-16x9",
+      "name": "Circle Mask (16:9)",
+      "category": "Transitions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-tr-circle-mask-16x9/template.json"
+    },
+    {
+      "id": "mm-tr-circle-mask-9x16",
+      "name": "Circle Mask (9:16)",
+      "category": "Transitions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-tr-circle-mask-9x16/template.json"
+    },
+    {
+      "id": "mm-tr-stripes-16x9",
+      "name": "Stripe Bands (16:9)",
+      "category": "Transitions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-tr-stripes-16x9/template.json"
+    },
+    {
+      "id": "mm-tr-stripes-9x16",
+      "name": "Stripe Bands (9:16)",
+      "category": "Transitions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-tr-stripes-9x16/template.json"
+    },
+    {
+      "id": "mm-tr-flash-16x9",
+      "name": "Flash Cut (16:9)",
+      "category": "Transitions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-tr-flash-16x9/template.json"
+    },
+    {
+      "id": "mm-tr-flash-9x16",
+      "name": "Flash Cut (9:16)",
+      "category": "Transitions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-tr-flash-9x16/template.json"
+    },
+    {
+      "id": "mm-tr-zoom-through-16x9",
+      "name": "Zoom Through (16:9)",
+      "category": "Transitions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-tr-zoom-through-16x9/template.json"
+    },
+    {
+      "id": "mm-tr-zoom-through-9x16",
+      "name": "Zoom Through (9:16)",
+      "category": "Transitions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-tr-zoom-through-9x16/template.json"
+    },
+    {
+      "id": "mm-tr-glitch-lite-16x9",
+      "name": "Light Glitch (16:9)",
+      "category": "Transitions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-tr-glitch-lite-16x9/template.json"
+    },
+    {
+      "id": "mm-tr-glitch-lite-9x16",
+      "name": "Light Glitch (9:16)",
+      "category": "Transitions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-tr-glitch-lite-9x16/template.json"
+    },
+    {
+      "id": "mm-io-logo-shapes-16x9",
+      "name": "Logo on Shapes (16:9)",
+      "category": "Intro Outro",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-io-logo-shapes-16x9/template.json"
+    },
+    {
+      "id": "mm-io-logo-shapes-9x16",
+      "name": "Logo on Shapes (9:16)",
+      "category": "Intro Outro",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-io-logo-shapes-9x16/template.json"
+    },
+    {
+      "id": "mm-io-text-line-16x9",
+      "name": "Intro Text + Line (16:9)",
+      "category": "Intro Outro",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-io-text-line-16x9/template.json"
+    },
+    {
+      "id": "mm-io-text-line-9x16",
+      "name": "Intro Text + Line (9:16)",
+      "category": "Intro Outro",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-io-text-line-9x16/template.json"
+    },
+    {
+      "id": "mm-io-social-outro-16x9",
+      "name": "Social Buttons Outro (16:9)",
+      "category": "Intro Outro",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-io-social-outro-16x9/template.json"
+    },
+    {
+      "id": "mm-io-social-outro-9x16",
+      "name": "Social Buttons Outro (9:16)",
+      "category": "Intro Outro",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-io-social-outro-9x16/template.json"
+    },
+    {
+      "id": "mm-io-end-card-16x9",
+      "name": "End Card Map (16:9)",
+      "category": "Intro Outro",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-io-end-card-16x9/template.json"
+    },
+    {
+      "id": "mm-io-end-card-9x16",
+      "name": "End Card Map (9:16)",
+      "category": "Intro Outro",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-io-end-card-9x16/template.json"
+    },
+    {
+      "id": "mm-soc-subscribe-16x9",
+      "name": "Subscribe Callout (16:9)",
+      "category": "Social Media",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-soc-subscribe-16x9/template.json"
+    },
+    {
+      "id": "mm-soc-subscribe-9x16",
+      "name": "Subscribe Callout (9:16)",
+      "category": "Social Media",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-soc-subscribe-9x16/template.json"
+    },
+    {
+      "id": "mm-soc-progress-16x9",
+      "name": "Progress Bar Overlay (16:9)",
+      "category": "Social Media",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-soc-progress-16x9/template.json"
+    },
+    {
+      "id": "mm-soc-progress-9x16",
+      "name": "Progress Bar Overlay (9:16)",
+      "category": "Social Media",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-soc-progress-9x16/template.json"
+    },
+    {
+      "id": "mm-soc-notify-16x9",
+      "name": "Notification Toast (16:9)",
+      "category": "Social Media",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-soc-notify-16x9/template.json"
+    },
+    {
+      "id": "mm-soc-notify-9x16",
+      "name": "Notification Toast (9:16)",
+      "category": "Social Media",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-soc-notify-9x16/template.json"
+    },
+    {
+      "id": "mm-soc-like-share-16x9",
+      "name": "Like / Share Sticker (16:9)",
+      "category": "Social Media",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-soc-like-share-16x9/template.json"
+    },
+    {
+      "id": "mm-soc-like-share-9x16",
+      "name": "Like / Share Sticker (9:16)",
+      "category": "Social Media",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-soc-like-share-9x16/template.json"
+    },
+    {
+      "id": "mm-soc-quote-sticker-16x9",
+      "name": "Quote Sticker (16:9)",
+      "category": "Social Media",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-soc-quote-sticker-16x9/template.json"
+    },
+    {
+      "id": "mm-soc-quote-sticker-9x16",
+      "name": "Quote Sticker (9:16)",
+      "category": "Social Media",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-soc-quote-sticker-9x16/template.json"
+    },
+    {
+      "id": "mm-soc-countdown-16x9",
+      "name": "Countdown Badge (16:9)",
+      "category": "Social Media",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-soc-countdown-16x9/template.json"
+    },
+    {
+      "id": "mm-soc-countdown-9x16",
+      "name": "Countdown Badge (9:16)",
+      "category": "Social Media",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-soc-countdown-9x16/template.json"
+    },
+    {
+      "id": "mm-inf-bars-16x9",
+      "name": "Animated Bars (16:9)",
+      "category": "Infographics",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-inf-bars-16x9/template.json"
+    },
+    {
+      "id": "mm-inf-bars-9x16",
+      "name": "Animated Bars (9:16)",
+      "category": "Infographics",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-inf-bars-9x16/template.json"
+    },
+    {
+      "id": "mm-inf-pie-16x9",
+      "name": "Pie Reveal (16:9)",
+      "category": "Infographics",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-inf-pie-16x9/template.json"
+    },
+    {
+      "id": "mm-inf-pie-9x16",
+      "name": "Pie Reveal (9:16)",
+      "category": "Infographics",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-inf-pie-9x16/template.json"
+    },
+    {
+      "id": "mm-inf-kpi-16x9",
+      "name": "KPI Counter (16:9)",
+      "category": "Infographics",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-inf-kpi-16x9/template.json"
+    },
+    {
+      "id": "mm-inf-kpi-9x16",
+      "name": "KPI Counter (9:16)",
+      "category": "Infographics",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-inf-kpi-9x16/template.json"
+    },
+    {
+      "id": "mm-inf-timeline-16x9",
+      "name": "Timeline Steps (16:9)",
+      "category": "Infographics",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-inf-timeline-16x9/template.json"
+    },
+    {
+      "id": "mm-inf-timeline-9x16",
+      "name": "Timeline Steps (9:16)",
+      "category": "Infographics",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-inf-timeline-9x16/template.json"
+    },
+    {
+      "id": "mm-inf-bullets-16x9",
+      "name": "Animated Bullets (16:9)",
+      "category": "Infographics",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-inf-bullets-16x9/template.json"
+    },
+    {
+      "id": "mm-inf-bullets-9x16",
+      "name": "Animated Bullets (9:16)",
+      "category": "Infographics",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-inf-bullets-9x16/template.json"
+    },
+    {
+      "id": "mm-ov-frame-16x9",
+      "name": "Animated Frame (16:9)",
+      "category": "Overlays",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-ov-frame-16x9/template.json"
+    },
+    {
+      "id": "mm-ov-frame-9x16",
+      "name": "Animated Frame (9:16)",
+      "category": "Overlays",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-ov-frame-9x16/template.json"
+    },
+    {
+      "id": "mm-ov-crosshair-16x9",
+      "name": "Crosshair Corners (16:9)",
+      "category": "Overlays",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-ov-crosshair-16x9/template.json"
+    },
+    {
+      "id": "mm-ov-crosshair-9x16",
+      "name": "Crosshair Corners (9:16)",
+      "category": "Overlays",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-ov-crosshair-9x16/template.json"
+    },
+    {
+      "id": "mm-ov-ticker-16x9",
+      "name": "Scrolling Ticker (16:9)",
+      "category": "Overlays",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-ov-ticker-16x9/template.json"
+    },
+    {
+      "id": "mm-ov-ticker-9x16",
+      "name": "Scrolling Ticker (9:16)",
+      "category": "Overlays",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-ov-ticker-9x16/template.json"
+    },
+    {
+      "id": "mm-ov-watermark-16x9",
+      "name": "Animated Watermark (16:9)",
+      "category": "Overlays",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-ov-watermark-16x9/template.json"
+    },
+    {
+      "id": "mm-ov-watermark-9x16",
+      "name": "Animated Watermark (9:16)",
+      "category": "Overlays",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-ov-watermark-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-word-highlight-16x9",
+      "name": "Caption Word Highlight (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-word-highlight-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-word-highlight-9x16",
+      "name": "Caption Word Highlight (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-word-highlight-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-karaoke-16x9",
+      "name": "Caption Karaoke (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-karaoke-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-karaoke-9x16",
+      "name": "Caption Karaoke (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-karaoke-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-pop-in-16x9",
+      "name": "Caption Pop-In (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-pop-in-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-pop-in-9x16",
+      "name": "Caption Pop-In (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-pop-in-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-typewriter-16x9",
+      "name": "Caption Typewriter (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-typewriter-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-typewriter-9x16",
+      "name": "Caption Typewriter (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-typewriter-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-mask-reveal-16x9",
+      "name": "Caption Mask Reveal (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-mask-reveal-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-mask-reveal-9x16",
+      "name": "Caption Mask Reveal (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-mask-reveal-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-color-box-16x9",
+      "name": "Caption Color Box (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-color-box-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-color-box-9x16",
+      "name": "Caption Color Box (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-color-box-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-outline-16x9",
+      "name": "Caption Outline (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-outline-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-outline-9x16",
+      "name": "Caption Outline (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-outline-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-bounce-16x9",
+      "name": "Caption Bounce (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-bounce-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-bounce-9x16",
+      "name": "Caption Bounce (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-bounce-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-smooth-16x9",
+      "name": "Caption Smooth (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-smooth-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-smooth-9x16",
+      "name": "Caption Smooth (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-smooth-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-minimal-16x9",
+      "name": "Caption Minimal (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-minimal-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-minimal-9x16",
+      "name": "Caption Minimal (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-minimal-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-shorts-16x9",
+      "name": "Caption Shorts Vertical (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-shorts-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-shorts-9x16",
+      "name": "Caption Shorts Vertical (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-shorts-9x16/template.json"
+    },
+    {
+      "id": "mm-cap-cinema-16x9",
+      "name": "Caption Cinema (16:9)",
+      "category": "Captions",
+      "aspect": "16:9",
+      "status": "missing-mogrt",
+      "path": "mm-cap-cinema-16x9/template.json"
+    },
+    {
+      "id": "mm-cap-cinema-9x16",
+      "name": "Caption Cinema (9:16)",
+      "category": "Captions",
+      "aspect": "9:16",
+      "status": "missing-mogrt",
+      "path": "mm-cap-cinema-9x16/template.json"
+    }
+  ]
+}

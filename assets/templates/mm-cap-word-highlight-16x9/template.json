@@ -1,0 +1,103 @@
+{
+  "id": "mm-cap-word-highlight-16x9",
+  "name": "Caption Word Highlight (16:9)",
+  "category": "Captions",
+  "version": "1.0.0",
+  "tags": [
+    "caption",
+    "wp2",
+    "16:9"
+  ],
+  "description": "Caption Word Highlight motion template.",
+  "minPremiere": "25.6.0",
+  "mogrt": "mm-cap-word-highlight-16x9.mogrt",
+  "durationDefault": 4,
+  "aspect": "16:9",
+  "fps": 30,
+  "parameters": [
+    {
+      "id": "title",
+      "label": {
+        "en": "Title",
+        "fr": "Titre"
+      },
+      "type": "text",
+      "masterPropertyName": "MM_Title",
+      "defaultValue": "MasterMotion"
+    },
+    {
+      "id": "subtitle",
+      "label": {
+        "en": "Subtitle",
+        "fr": "Sous-titre"
+      },
+      "type": "text",
+      "masterPropertyName": "MM_Subtitle",
+      "defaultValue": ""
+    },
+    {
+      "id": "colorPrimary",
+      "label": {
+        "en": "Primary color",
+        "fr": "Couleur principale"
+      },
+      "type": "color",
+      "masterPropertyName": "MM_ColorPrimary",
+      "defaultValue": "#5C9CE6"
+    },
+    {
+      "id": "colorSecondary",
+      "label": {
+        "en": "Secondary color",
+        "fr": "Couleur secondaire"
+      },
+      "type": "color",
+      "masterPropertyName": "MM_ColorSecondary",
+      "defaultValue": "#1A1A1A"
+    },
+    {
+      "id": "intensity",
+      "label": {
+        "en": "Intensity",
+        "fr": "Intensité"
+      },
+      "type": "slider",
+      "masterPropertyName": "MM_Intensity",
+      "defaultValue": 70,
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "id": "inDuration",
+      "label": {
+        "en": "In duration (s)",
+        "fr": "Durée entrée (s)"
+      },
+      "type": "number",
+      "masterPropertyName": "MM_InDuration",
+      "defaultValue": 0.4,
+      "min": 0.1,
+      "max": 3,
+      "step": 0.05
+    }
+  ],
+  "animation": {
+    "inDuration": 0.4,
+    "outDuration": 0.35,
+    "loop": false
+  },
+  "previewSpec": {
+    "kind": "caption",
+    "seed": 901,
+    "primaryColor": "#5C9CE6",
+    "secondaryColor": "#1A1A1A",
+    "sampleText": "Caption Word Highlight"
+  },
+  "license": "MasterMotion internal — replace with asset license when mogrt delivered",
+  "author": "MasterMotion (to fabricate)",
+  "status": "missing-mogrt",
+  "fabNotes": "",
+  "previewStatic": "../../previews/mm-cap-word-highlight-16x9.svg",
+  "previewAnim": "../../previews/mm-cap-word-highlight-16x9-anim.svg"
+}

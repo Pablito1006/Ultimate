@@ -1,0 +1,102 @@
+{
+  "id": "mm-tr-slide-blur-9x16",
+  "name": "Slide + Blur (9:16)",
+  "category": "Transitions",
+  "version": "1.0.0",
+  "tags": [
+    "transition",
+    "9:16"
+  ],
+  "description": "Directional slide with blur.",
+  "minPremiere": "25.6.0",
+  "mogrt": "mm-tr-slide-blur-9x16.mogrt",
+  "durationDefault": 1.2,
+  "aspect": "9:16",
+  "fps": 30,
+  "parameters": [
+    {
+      "id": "title",
+      "label": {
+        "en": "Title",
+        "fr": "Titre"
+      },
+      "type": "text",
+      "masterPropertyName": "MM_Title",
+      "defaultValue": "MasterMotion"
+    },
+    {
+      "id": "subtitle",
+      "label": {
+        "en": "Subtitle",
+        "fr": "Sous-titre"
+      },
+      "type": "text",
+      "masterPropertyName": "MM_Subtitle",
+      "defaultValue": ""
+    },
+    {
+      "id": "colorPrimary",
+      "label": {
+        "en": "Primary color",
+        "fr": "Couleur principale"
+      },
+      "type": "color",
+      "masterPropertyName": "MM_ColorPrimary",
+      "defaultValue": "#5C9CE6"
+    },
+    {
+      "id": "colorSecondary",
+      "label": {
+        "en": "Secondary color",
+        "fr": "Couleur secondaire"
+      },
+      "type": "color",
+      "masterPropertyName": "MM_ColorSecondary",
+      "defaultValue": "#1A1A1A"
+    },
+    {
+      "id": "intensity",
+      "label": {
+        "en": "Intensity",
+        "fr": "Intensité"
+      },
+      "type": "slider",
+      "masterPropertyName": "MM_Intensity",
+      "defaultValue": 70,
+      "min": 0,
+      "max": 100,
+      "step": 1
+    },
+    {
+      "id": "inDuration",
+      "label": {
+        "en": "In duration (s)",
+        "fr": "Durée entrée (s)"
+      },
+      "type": "number",
+      "masterPropertyName": "MM_InDuration",
+      "defaultValue": 0.4,
+      "min": 0.1,
+      "max": 3,
+      "step": 0.05
+    }
+  ],
+  "animation": {
+    "inDuration": 0.4,
+    "outDuration": 0.35,
+    "loop": false
+  },
+  "previewSpec": {
+    "kind": "transition",
+    "seed": 453,
+    "primaryColor": "#5C9CE6",
+    "secondaryColor": "#1A1A1A",
+    "sampleText": "Slide + Blur"
+  },
+  "license": "MasterMotion internal — replace with asset license when mogrt delivered",
+  "author": "MasterMotion (to fabricate)",
+  "status": "missing-mogrt",
+  "fabNotes": "Directional slide with blur.",
+  "previewStatic": "../../previews/mm-tr-slide-blur-9x16.svg",
+  "previewAnim": "../../previews/mm-tr-slide-blur-9x16-anim.svg"
+}

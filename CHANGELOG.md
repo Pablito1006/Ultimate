@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.2.5 — 2026-10-17
+
+### Added (WP3)
+
+- Real motion template system: `template.json` schema, ≥45 designs × 16:9/9:16 (118 entries), status `missing-mogrt` until designer delivers `.mogrt`
+- `npm run templates:generate` / `previews` / `validate:templates` / `fixture:mogrt`
+- Template library (search, favorites, recents, user library path), MOGRT inspector + assisted draft
+- Insertion via `SequenceEditor.insertMogrtFromPath` + ComponentParam / MogrtText writes with re-read; blocked when file missing (no fake success)
+- PreviewablePlan motion + aperçu B SVG (`motion-template`)
+- Docs: `docs/api/WP3-apis.md`, `docs/templates/AUTHORING.md`, `MOGRT_STRUCTURE.md`
+- Tests: schema, mogrt fixture ZIP, motion preview plan, contract insert/verify on fakePremiere
+
+### Notes
+
+- Built-in catalog ships without binary `.mogrt` (honest « à fabriquer »)
+- Param text write may fail on live Premiere (known UXP limits) → message + manual Essential Graphics edit
+
 ## 0.2.4 — 2026-10-17
 
 ### Added (WP2)

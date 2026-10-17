@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Pie Reveal (16:9)">
+  <rect width="480" height="270" fill="#0E0E10"/>
+  <g><animateTransform attributeName="transform" type="translate" values="0 8;0 0;0 8" dur="2s" repeatCount="indefinite"/>
+      <rect x="72" y="81" width="240" height="32.4" fill="#5C9CE6"/>
+      <rect x="72" y="129.6" width="168" height="32.4" fill="#5C9CE6" opacity="0.7"/>
+      <rect x="72" y="178.20000000000002" width="288" height="32.4" fill="#5C9CE6" opacity="0.5"/>
+    </g>
+  <text x="8" y="262" fill="#666" font-size="9" font-family="monospace">mm-inf-pie-16x9</text>
+</svg>

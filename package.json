@@ -1,6 +1,6 @@
 {
   "name": "mastermotion",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "MasterMotion & AI Toolkit Pro — Adobe Premiere Pro UXP plugin",
   "private": true,
   "type": "module",
@@ -16,7 +16,11 @@
     "test:coverage": "vitest run --coverage",
     "validate:manifest": "node scripts/validate-manifest.mjs",
     "verify:versions": "node scripts/verify-versions.mjs",
-    "verify": "npm run typecheck && npm run lint && npm run test:coverage && npm run build && npm run validate:manifest && npm run verify:versions",
+    "templates:generate": "node scripts/template-factory/generate-templates.mjs",
+    "previews": "node scripts/template-factory/generate-previews.mjs",
+    "fixture:mogrt": "node scripts/create-mogrt-fixture.mjs",
+    "validate:templates": "node scripts/validate-templates.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run test:coverage && npm run build && npm run validate:manifest && npm run verify:versions && npm run validate:templates",
     "package": "node scripts/package-ccx.mjs"
   },
   "dependencies": {
@@ -36,6 +40,7 @@
     "concurrently": "^9.2.1",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^5.1.0",
+    "fflate": "^0.8.3",
     "rimraf": "^6.0.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.58.1",

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Multi-Guest Interview LT (16:9)">
+  <rect width="480" height="270" fill="#0E0E10"/>
+  <g>
+      <rect x="38.4" y="194.4" width="264" height="37.800000000000004" rx="4" fill="#5C9CE6" opacity="0.95"/>
+      <text x="48" y="216" fill="#1A1A1A" font-family="Segoe UI, sans-serif" font-size="16.8" font-weight="600">Multi-Guest Interview LT</text>
+    </g>
+  <text x="8" y="262" fill="#666" font-size="9" font-family="monospace">mm-lt-multi-guest-16x9</text>
+</svg>

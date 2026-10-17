@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="270" height="480" viewBox="0 0 270 480" role="img" aria-label="Film Credit Roll (9:16)">
+  <rect width="270" height="480" fill="#0E0E10"/>
+  <g><animateTransform attributeName="transform" type="translate" values="0 8;0 0;0 8" dur="2s" repeatCount="indefinite"/>
+      <text x="130" y="244" text-anchor="middle" dominant-baseline="middle"
+        fill="#F5F0E8" font-family="Georgia, serif" font-size="18.900000000000002" font-weight="700">Film Credit Roll</text>
+      <line x1="81" y1="297.6" x2="189" y2="297.6" stroke="#F5F0E8" stroke-width="2"/>
+    </g>
+  <text x="8" y="472" fill="#666" font-size="9" font-family="monospace">mm-cinema-film-credit-9x16</text>
+</svg>

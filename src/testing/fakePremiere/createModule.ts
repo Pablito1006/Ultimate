@@ -128,6 +128,28 @@ function createTrackItem(
       return 0;
     },
     async getComponentChain() {
+      const params = clip.mogrtParams || [];
+      const component =
+        params.length === 0
+          ? null
+          : {
+              async getDisplayName() {
+                return "Motion Graphics Template";
+              },
+              async getMatchName() {
+                return "AE.ADBE Motion Graphics";
+              },
+              getParamCount() {
+                return params.length;
+              },
+              getParam(paramIndex = 0) {
+                const p = params[paramIndex];
+                if (!p) {
+                  return null;
+                }
+                return createFakeComponentParam(p);
+              },
+            };
       return {
         createAppendComponentAction() {
           return { run() {} };
@@ -142,14 +164,79 @@ function createTrackItem(
           return { run() {} };
         },
         getComponentCount() {
-          return 0;
+          return component ? 1 : 0;
         },
-        getComponentAtIndex() {
-          return null;
+        getComponentAtIndex(index: number) {
+          return index === 0 ? component : null;
         },
       };
     },
     _fakeClipId: clip.id,
+    _fakeClip: clip,
+  };
+}
+
+function createFakeComponentParam(param: import("./types").FakeMogrtParam): Record<string, unknown> {
+  return {
+    displayName: param.displayName,
+    async areKeyframesSupported() {
+      return false;
+    },
+    isTimeVarying() {
+      return false;
+    },
+    createKeyframe(value: unknown) {
+      return { _value: value, position: createTickTime(0) };
+    },
+    createSetValueAction(inKeyFrame: { _value?: unknown }) {
+      return {
+        run() {
+          const v = inKeyFrame?._value;
+          if (v && typeof v === "object" && "getText" in (v as object)) {
+            param.value = { text: (v as { getText: () => string }).getText() };
+            param.kind = "text";
+          } else if (v && typeof v === "object" && "hex" in (v as object)) {
+            param.value = v;
+            param.kind = "color";
+          } else {
+            param.value = v;
+          }
+        },
+      };
+    },
+    async getStartValue() {
+      if (param.kind === "text") {
+        const text =
+          param.value && typeof param.value === "object" && "text" in (param.value as object)
+            ? String((param.value as { text: string }).text)
+            : String(param.value ?? "");
+        return createFakeMogrtText(text);
+      }
+      return param.value;
+    },
+    async getValueAtTime() {
+      return { value: param.value as string | number | boolean };
+    },
+  };
+}
+
+function createFakeMogrtText(initial: string): {
+  getText: () => string;
+  setText: (t: string) => boolean;
+  isUniformStyling: () => boolean;
+} {
+  let text = initial;
+  return {
+    getText() {
+      return text;
+    },
+    setText(t: string) {
+      text = t;
+      return true;
+    },
+    isUniformStyling() {
+      return true;
+    },
   };
 }
 
@@ -464,13 +551,78 @@ export function createFakePremiereModule(options: FakeWorldOptions = {}): {
       },
     },
     SequenceEditor: {
-      getEditor() {
+      getEditor(_sequence?: unknown) {
+        void _sequence;
         return {
-          insertMogrtFromPath() {
+          insertMogrtFromPath(
+            inMGTPath: string,
+            inTime: FakeTickTime,
+            inVideoTrackIndex: number,
+            inAudioTrackIndex: number
+          ) {
+            const project = world.project;
+            if (!project || !project.activeSequenceGuid) {
+              return [];
+            }
+            const sequence = project.sequences.find((s) => s.guid === project.activeSequenceGuid);
+            if (!sequence) {
+              return [];
+            }
+            const vIdx = Math.max(0, inVideoTrackIndex);
+            while (sequence.videoTracks.length <= vIdx) {
+              sequence.videoTracks.push({ clips: [] });
+            }
+            const start = inTime?.seconds ?? sequence.playerPositionSeconds;
+            const duration = 4;
+            const baseName = inMGTPath.replace(/^.*[\\/]/, "").replace(/\.mogrt$/i, "");
+            const clip: FakeClipData = {
+              id: nextId("mogrt"),
+              name: `MM:${baseName}`,
+              startSeconds: start,
+              endSeconds: start + duration,
+              mogrtPath: inMGTPath,
+              mogrtParams: [
+                { displayName: "MM_Title", value: { text: "MasterMotion" }, kind: "text" },
+                { displayName: "MM_Subtitle", value: { text: "" }, kind: "text" },
+                { displayName: "MM_ColorPrimary", value: { hex: "#5C9CE6" }, kind: "color" },
+                { displayName: "MM_ColorSecondary", value: { hex: "#1A1A1A" }, kind: "color" },
+                { displayName: "MM_Intensity", value: 70, kind: "number" },
+                { displayName: "MM_InDuration", value: 0.4, kind: "number" },
+              ],
+            };
+            sequence.videoTracks[vIdx].clips.push(clip);
+            if (sequence.audioTracks[inAudioTrackIndex]) {
+              sequence.audioTracks[inAudioTrackIndex].clips.push({
+                ...clip,
+                id: nextId("mogrt-a"),
+                mogrtParams: undefined,
+              });
+            }
+            world.transactionLog.push(`insertMogrtFromPath:${inMGTPath}`);
+            return [createTrackItem(clip, project, "video")];
+          },
+          insertMogrtFromLibrary() {
             return [];
           },
         };
       },
+      async getInstalledMogrtPath() {
+        return "/fake/mogrt";
+      },
+    },
+    MogrtText: function FakeMogrtText(this: {
+      setText: (t: string) => boolean;
+      getText: () => string;
+      isUniformStyling: () => boolean;
+    }) {
+      const inner = createFakeMogrtText("");
+      this.setText = inner.setText.bind(inner);
+      this.getText = inner.getText.bind(inner);
+      this.isUniformStyling = inner.isUniformStyling.bind(inner);
+      return this;
+    } as unknown as { new (): ReturnType<typeof createFakeMogrtText> },
+    Color: {
+      // minimal stub for createKeyframe color values in tests
     },
     Transcript: {
       hasTranscript(clip: { _fakeClipId?: string; name?: string }) {

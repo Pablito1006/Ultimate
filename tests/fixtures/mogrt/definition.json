@@ -1,0 +1,37 @@
+{
+  "name": "MM Sample Title",
+  "author": "MasterMotion fixture",
+  "version": "1.0.0",
+  "masterProperties": [
+    {
+      "name": "MM_Title",
+      "type": "text",
+      "uiName": "Title"
+    },
+    {
+      "name": "MM_Subtitle",
+      "type": "text",
+      "uiName": "Subtitle"
+    },
+    {
+      "name": "MM_ColorPrimary",
+      "type": "color",
+      "uiName": "Primary color"
+    },
+    {
+      "name": "MM_ColorSecondary",
+      "type": "color",
+      "uiName": "Secondary color"
+    },
+    {
+      "name": "MM_Intensity",
+      "type": "slider",
+      "uiName": "Intensity"
+    },
+    {
+      "name": "MM_InDuration",
+      "type": "number",
+      "uiName": "In duration"
+    }
+  ]
+}

@@ -20,12 +20,22 @@ export interface FakeMarkerData {
   durationSeconds: number;
 }
 
+export interface FakeMogrtParam {
+  displayName: string;
+  /** Runtime value — string | number | boolean | { text: string } for MogrtText | { hex: string } for color */
+  value: unknown;
+  kind: "text" | "color" | "number" | "boolean" | "other";
+}
+
 export interface FakeClipData {
   id: string;
   name: string;
   startSeconds: number;
   endSeconds: number;
   disabled?: boolean;
+  /** When set, clip was inserted from a .mogrt path (fake). */
+  mogrtPath?: string;
+  mogrtParams?: FakeMogrtParam[];
 }
 
 export interface FakeTrackData {

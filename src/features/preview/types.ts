@@ -28,7 +28,14 @@ export interface PreviewSummary {
   levelCNote?: string;
 }
 
-export type PreviewVisualKind = "none" | "list" | "rename-flip" | "split-grid" | "caption-karaoke" | "timeline";
+export type PreviewVisualKind =
+  | "none"
+  | "list"
+  | "rename-flip"
+  | "split-grid"
+  | "caption-karaoke"
+  | "timeline"
+  | "motion-template";
 
 export interface PreviewVisual {
   kind: PreviewVisualKind;

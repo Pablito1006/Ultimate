@@ -41,6 +41,90 @@ export function AnimatedPreview({ visual }: AnimatedPreviewProps): ReactElement 
       {visual.kind === "caption-karaoke" ? (
         <CaptionKaraokeView payload={visual.payload as CaptionKaraokePayload} />
       ) : null}
+      {visual.kind === "motion-template" ? (
+        <MotionTemplateView payload={visual.payload as MotionTemplatePayload} />
+      ) : null}
+    </div>
+  );
+}
+
+export interface MotionTemplatePayload {
+  templateId: string;
+  name: string;
+  aspect: string;
+  previewSpec: {
+    kind: string;
+    seed: number;
+    primaryColor?: string;
+    secondaryColor?: string;
+    sampleText?: string;
+  };
+  values: Record<string, string | number | boolean>;
+  status: string;
+  canInsertMogrt: boolean;
+}
+
+function MotionTemplateView({ payload }: { payload: MotionTemplatePayload }): ReactElement {
+  const [t, setT] = useState(0);
+  const primary =
+    (typeof payload.values.colorPrimary === "string"
+      ? payload.values.colorPrimary
+      : payload.previewSpec.primaryColor) || "#5C9CE6";
+  const text =
+    (typeof payload.values.title === "string"
+      ? payload.values.title
+      : payload.previewSpec.sampleText) || payload.name;
+  const isVertical = payload.aspect === "9:16";
+  const w = isVertical ? 180 : 320;
+  const h = isVertical ? 320 : 180;
+
+  useEffect(() => {
+    const id = setInterval(() => setT((v) => (v + 1) % 40), 50);
+    return () => clearInterval(id);
+  }, []);
+
+  const phase = t / 40;
+  const opacity = 0.4 + 0.6 * Math.abs(Math.sin(phase * Math.PI));
+  const yOffset = Math.round((1 - phase) * 12);
+
+  return (
+    <div>
+      <p className="mm-muted">
+        {payload.status === "missing-mogrt" ? "À fabriquer · " : ""}
+        {payload.canInsertMogrt ? "Ready to insert" : "Preview only (no .mogrt)"}
+      </p>
+      <svg
+        className="mm-anim-motion"
+        width={w}
+        height={h}
+        viewBox={`0 0 ${w} ${h}`}
+        role="img"
+        aria-label={`Preview ${payload.name}`}
+      >
+        <rect width={w} height={h} fill="#0E0E10" />
+        <g opacity={opacity} transform={`translate(0 ${yOffset})`}>
+          <text
+            x={w / 2}
+            y={h / 2}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill={String(primary)}
+            fontFamily="Georgia, serif"
+            fontSize={Math.max(14, w * 0.06)}
+            fontWeight={700}
+          >
+            {String(text).slice(0, 28)}
+          </text>
+          <line
+            x1={w * 0.28}
+            y1={h * 0.62}
+            x2={w * 0.72}
+            y2={h * 0.62}
+            stroke={String(primary)}
+            strokeWidth={2}
+          />
+        </g>
+      </svg>
     </div>
   );
 }

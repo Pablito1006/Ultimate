@@ -2,8 +2,8 @@
 
 | # | Feature | Status | Apply path |
 | --- | --- | --- | --- |
-| 1 | Créer / personnaliser animations | Opérationnel | Motion panel → template params → inject |
-| 2 | Templates motion design | Opérationnel | Registry + MOGRT `insertMogrtFromPath` ou marker fallback |
+| 1 | Créer / personnaliser animations | Opérationnel (aperçu A/B) | Motion panel → plan → insert MOGRT / params |
+| 2 | Templates motion design | Opérationnel (catalogue) | 118 `template.json` ; `.mogrt` manquant = « à fabriquer » ; `validate:templates` |
 | 3 | Sous-titres auto | Opérationnel (native + mock) | `TranscriptService` + Captions Studio ; mock offline fallback |
 | 4 | Styles captions animés | Opérationnel (presets) | 12 styles ; apply = markers + metadata ; MOGRT WP3 |
 | 5 | Analyser timeline | Opérationnel | `TimelineService.analyzeActive` |

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="270" height="480" viewBox="0 0 270 480" role="img" aria-label="Dual Line + Logo LT (9:16)">
+  <rect width="270" height="480" fill="#0E0E10"/>
+  <g><animateTransform attributeName="transform" type="translate" values="0 8;0 0;0 8" dur="2s" repeatCount="indefinite"/>
+      <rect x="21.6" y="345.59999999999997" width="148.5" height="67.2" rx="4" fill="#5C9CE6" opacity="0.95"/>
+      <text x="27" y="383.99999999999994" fill="#1A1A1A" font-family="Segoe UI, sans-serif" font-size="12" font-weight="600">Dual Line + Logo LT</text>
+    </g>
+  <text x="8" y="472" fill="#666" font-size="9" font-family="monospace">mm-lt-dual-logo-9x16</text>
+</svg>

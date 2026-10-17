@@ -15,6 +15,9 @@ Légende : ✅ disponible · ⚠️ partiel / version supérieure · ❌ indispo
 | Marqueurs (ajout) | ✅ | ✅ | ✅ | 🧪 |
 | Rename batch | ✅ | ✅ | ✅ | 🧪 |
 | Motion MOGRT `insertMogrtFromPath` | 🧪 | 🧪 | 🧪 | 🧪 |
+| Motion template library + validate:templates | ✅ | ✅ | ✅ | ✅ |
+| Motion param write (ComponentParam / MogrtText) | 🧪 | 🧪 | 🧪 | 🧪 partial |
+| Motion aperçu B (SVG previewSpec) | ✅ | ✅ | ✅ | ✅ |
 | Transcript `transcribeClipProjectItem` | 🧪 | 🧪 | 🧪 | 🧪 |
 | Transcript `hasTranscript` / `querySupportedLanguages` | ❌ | ❌ | ⚠️ 26.3+ | 🧪 |
 | Captions Studio (parse / reading rules / export) | ✅ | ✅ | ✅ | ✅ |
@@ -35,4 +38,4 @@ Légende : ✅ disponible · ⚠️ partiel / version supérieure · ❌ indispo
 | Aperçu B Captions karaoke | ✅ | ✅ | ✅ | ✅ |
 | Aperçu C (copie séquence) | ❌ WP1 | ❌ | ❌ | ❌ |
 
-Mise à jour : WP1 (2026-10-17). Actualiser à chaque chantier.
+Mise à jour : WP3 (2026-10-17). Actualiser à chaque chantier.

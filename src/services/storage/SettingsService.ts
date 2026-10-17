@@ -12,6 +12,9 @@ export interface PluginSettings {
   loggingLevel: "debug" | "info" | "warn" | "error";
   macros: Macro[];
   favoriteTemplateIds: string[];
+  recentTemplateIds: string[];
+  /** Optional user-chosen local templates folder (absolute path). */
+  templateLibraryPath: string;
 }
 
 const STORAGE_KEY = "mastermotion.settings.v1";
@@ -24,6 +27,8 @@ const DEFAULT_SETTINGS: PluginSettings = {
   loggingLevel: "info",
   macros: BUILTIN_MACROS,
   favoriteTemplateIds: [],
+  recentTemplateIds: [],
+  templateLibraryPath: "",
 };
 
 function readLocalStorage(): string | null {
@@ -58,6 +63,8 @@ export class SettingsService {
         actions: m.actions.map((a) => ({ ...a, params: a.params ? { ...a.params } : undefined })),
       })),
       favoriteTemplateIds: DEFAULT_SETTINGS.favoriteTemplateIds.slice(),
+      recentTemplateIds: DEFAULT_SETTINGS.recentTemplateIds.slice(),
+      templateLibraryPath: DEFAULT_SETTINGS.templateLibraryPath,
     };
   }
 
@@ -94,6 +101,9 @@ export class SettingsService {
         favoriteTemplateIds: Array.isArray(parsed.favoriteTemplateIds)
           ? parsed.favoriteTemplateIds
           : [],
+        recentTemplateIds: Array.isArray(parsed.recentTemplateIds) ? parsed.recentTemplateIds : [],
+        templateLibraryPath:
+          typeof parsed.templateLibraryPath === "string" ? parsed.templateLibraryPath : "",
       };
       return this.cache;
     } catch (cause) {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="270" viewBox="0 0 480 270" role="img" aria-label="Notification Toast (16:9)">
+  <rect width="480" height="270" fill="#0E0E10"/>
+  <g><animateTransform attributeName="transform" type="translate" values="0 8;0 0;0 8" dur="2s" repeatCount="indefinite"/>
+      <rect x="72" y="94.5" width="336" height="75.60000000000001" rx="12" fill="#5C9CE6" opacity="0.9"/>
+      <text x="240" y="140.4" text-anchor="middle" fill="#fff" font-family="Segoe UI, sans-serif" font-size="19.2">Notification Toast</text>
+    </g>
+  <text x="8" y="262" fill="#666" font-size="9" font-family="monospace">mm-soc-notify-16x9</text>
+</svg>
