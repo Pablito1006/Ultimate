@@ -17,6 +17,9 @@ Légende : ✅ disponible · ⚠️ partiel / version supérieure · ❌ indispo
 | Motion MOGRT `insertMogrtFromPath` | 🧪 | 🧪 | 🧪 | 🧪 |
 | Transcript `transcribeClipProjectItem` | 🧪 | 🧪 | 🧪 | 🧪 |
 | Transcript `hasTranscript` / `querySupportedLanguages` | ❌ | ❌ | ⚠️ 26.3+ | 🧪 |
+| Captions Studio (parse / reading rules / export) | ✅ | ✅ | ✅ | ✅ |
+| Captions 12 styles (presets markers) | ✅ | ✅ | ✅ | ✅ |
+| Transcript re-import verify + SRT fallback | 🧪 | 🧪 | 🧪 | 🧪 |
 | ComponentParam lecture | 🧪 | 🧪 | 🧪 | 🧪 |
 | ComponentParam écriture | 🧪 | 🧪 | 🧪 | 🧪 |
 | Keyframes | 🧪 | 🧪 | 🧪 | 🧪 |

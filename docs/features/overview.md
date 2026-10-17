@@ -4,8 +4,8 @@
 | --- | --- | --- | --- |
 | 1 | Créer / personnaliser animations | Opérationnel | Motion panel → template params → inject |
 | 2 | Templates motion design | Opérationnel | Registry + MOGRT `insertMogrtFromPath` ou marker fallback |
-| 3 | Sous-titres auto | Opérationnel (mock STT) | `SubtitleEngine` → segments |
-| 4 | Styles captions animés | Opérationnel (presets) | 8 styles ; apply = markers + metadata style |
+| 3 | Sous-titres auto | Opérationnel (native + mock) | `TranscriptService` + Captions Studio ; mock offline fallback |
+| 4 | Styles captions animés | Opérationnel (presets) | 12 styles ; apply = markers + metadata ; MOGRT WP3 |
 | 5 | Analyser timeline | Opérationnel | `TimelineService.analyzeActive` |
 | 6 | Suggérer / déclencher SFX | Opérationnel (suggestions) | Scoring + markers d’approbation |
 | 7 | Automatiser audio | Partiel | Mute/unmute track ; pas de DSP inventé |
