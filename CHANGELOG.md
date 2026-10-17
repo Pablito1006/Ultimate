@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.3 — 2026-10-17
+
+### Added (WP1)
+
+- `src/features/preview/` — `PreviewablePlan`, `assertPlanReady`, `usePreviewSession`
+- UI: `PreviewBar`, `PlanList`, `AnimatedPreview`, `TimelineMiniMap`
+- Preview adapters: Rename, Split, Captions, Sound, Macros (`plan/describe/render/apply/verify`)
+- Level B: rename flip animation, split SVG grid, captions karaoke
+- Unit tests for pure `plan()` helpers and apply-without-plan guard
+- `docs/api/WP1-apis.md`
+
+### Changed
+
+- Rename / Split / Captions / Sound / Macros panels: Apply disabled until Preview
+- SplitScreenService delegates to `splitPreviewable`
+
+### Notes
+
+- Level C (trial on sequence copy) explicitly unavailable in WP1
+- Split apply still aligns starts only (crop/scale → WP5)
+
 ## 0.2.2 — 2026-10-17
 
 ### Added (WP0)

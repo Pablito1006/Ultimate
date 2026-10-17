@@ -1,6 +1,6 @@
 {
   "name": "mastermotion",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "MasterMotion & AI Toolkit Pro — Adobe Premiere Pro UXP plugin",
   "private": true,
   "type": "module",
