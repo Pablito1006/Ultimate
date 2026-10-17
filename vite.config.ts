@@ -34,5 +34,15 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+      include: ["src/premiere/**/*.ts"],
+      reporter: ["text", "text-summary"],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        statements: 80,
+      },
+    },
   },
 });
