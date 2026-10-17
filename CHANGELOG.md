@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.4 — 2026-10-17
+
+### Added (WP2)
+
+- `TranscriptService` — native Premiere Transcript API (transcribe, hasTranscript, languages, export/import) with capability probes
+- Tolerant Premiere transcript JSON parser + Adobe format docs (`docs/transcript/FORMAT.md`, fixtures)
+- Captions Studio: edit words, merge/split, vocabulary replace, re-import with verify + SRT/VTT/JSON fallback
+- Reading-rules engine (≤42 chars/line, ≤2 lines, ≤17 cps, min/max duration, fillers)
+- 12 caption style presets (MOGRT pending marked honestly for mask-reveal)
+- Import/export SRT, VTT, JSON, TXT
+- Tests: parser, reading rules, import/export, TranscriptService contract (≥20 cases)
+
+### Notes
+
+- No network / no AI translation (WP12)
+- CaptionTrack item writing still via CAP markers
+- Known Premiere import-commit quirk: verified by re-read; otherwise export fallback
+
 ## 0.2.3 — 2026-10-17
 
 ### Added (WP1)
