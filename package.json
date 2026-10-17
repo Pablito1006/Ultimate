@@ -1,0 +1,40 @@
+{
+  "name": "mastermotion",
+  "version": "0.2.1",
+  "description": "MasterMotion & AI Toolkit Pro — Adobe Premiere Pro UXP plugin",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && vite build && npm run copy:public",
+    "copy:public": "node scripts/copy-public.mjs",
+    "dev": "concurrently -k -n vite,types \"vite build --watch\" \"tsc --watch --noEmit --preserveWatchOutput\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "package": "node scripts/package-ccx.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@adobe/cc-ext-uxp-types": "^7.3.1",
+    "@adobe/eslint-plugin-premierepro": "^27.0.0-beta.56",
+    "@adobe/premierepro": "^27.0.0-beta.56",
+    "@eslint/js": "^9.39.4",
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.2.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.58.1",
+    "vite": "^6.0.7",
+    "vitest": "^3.0.5"
+  }
+}

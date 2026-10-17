@@ -1,0 +1,3 @@
+MasterMotion 0.2.1
+Premiere Pro 25.6+
+Double-cliquez Installer.bat

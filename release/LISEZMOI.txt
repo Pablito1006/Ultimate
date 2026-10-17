@@ -1,0 +1,51 @@
+========================================
+  MasterMotion - Installation
+========================================
+
+Aucune commande a taper.
+
+POURQUOI VOUS N AVEZ PAS VU CREATIVE CLOUD ?
+--------------------------------------------
+La fenetre "Installer" de Creative Cloud n apparait QUE si
+Adobe Creative Cloud Desktop est installe et fonctionne.
+Sur beaucoup de postes, ce n est pas le cas : c est normal.
+
+Le nouvel Installer.bat installe le plugin DIRECTEMENT
+pour Premiere Pro, sans Creative Cloud.
+
+INSTALLATION
+------------
+1. Double-cliquez sur :  Installer.bat
+2. Attendez le message : OK - MasterMotion est installe
+3. Fermez COMPLETEMENT Premiere Pro, puis rouvrez-le
+4. Dans Premiere :
+     Preferences / Settings -> Plugins
+     -> cochez "Enable developer mode"
+   Puis redemarrez Premiere encore une fois
+5. Ouvrez le panneau ICI (important) :
+     Fenetre -> UXP Plugins -> MasterMotion
+
+IMPORTANT
+---------
+* Ce n est PAS le menu "Extensions" (ancien CEP).
+* Cherchez : Fenetre -> UXP Plugins
+* Premiere Pro doit etre en version 25.6 ou plus recente
+
+DESINSTALLATION
+---------------
+Double-cliquez sur :  Desinstaller.bat
+Puis redemarrez Premiere Pro.
+
+SI CA NE MARCHE TOUJOURS PAS
+----------------------------
+1. Collez ce chemin dans l Explorateur Windows :
+   %APPDATA%\Adobe\UXP\Plugins\External
+   Vous devez voir un dossier com.mastermotion.toolkit_...
+
+2. Verifiez votre version Premiere :
+   Aide -> A propos de Premiere Pro
+   (il faut 25.6+)
+
+3. Premiere doit etre FERME pendant Installer.bat
+
+========================================
