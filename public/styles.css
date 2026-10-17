@@ -381,3 +381,56 @@ button:disabled {
   border-color: var(--mm-border);
   background: var(--mm-bg-hover);
 }
+
+.mm-btn--ghost {
+  background: transparent;
+}
+
+.mm-muted {
+  color: var(--mm-text-muted);
+  font-size: 11px;
+  margin: 4px 0;
+}
+
+.mm-diag-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  max-height: 280px;
+  overflow: auto;
+}
+
+.mm-diag-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--mm-border-subtle);
+  font-size: 11px;
+}
+
+.mm-diag-id {
+  font-family: var(--mm-font-mono);
+  flex: 1 1 140px;
+}
+
+.mm-diag-reason {
+  flex: 1 1 100%;
+  color: var(--mm-text-dim);
+  font-size: 10px;
+}
+
+.mm-diag-export {
+  margin-top: 8px;
+  padding: 8px;
+  max-height: 160px;
+  overflow: auto;
+  background: var(--mm-bg);
+  border: 1px solid var(--mm-border);
+  border-radius: var(--mm-radius);
+  font-family: var(--mm-font-mono);
+  font-size: 10px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
