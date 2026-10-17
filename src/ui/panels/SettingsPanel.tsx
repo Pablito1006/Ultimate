@@ -130,6 +130,7 @@ export function SettingsPanel(): ReactElement {
             onChange={(e) => void save({ transcriptionProvider: e.target.value })}
           >
             <option value="mock">Mock (offline)</option>
+            <option value="premiere-native">Premiere native Transcript</option>
           </select>
         </label>
         <label className="mm-field">

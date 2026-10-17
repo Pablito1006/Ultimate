@@ -394,6 +394,7 @@ export function createFakePremiereModule(options: FakeWorldOptions = {}): {
   world: FakeWorld;
 } {
   const world = createWorld(options);
+  const transcriptStore: Record<string, string> = {};
 
   const Constants = {
     TrackItemType: {
@@ -472,26 +473,103 @@ export function createFakePremiereModule(options: FakeWorldOptions = {}): {
       },
     },
     Transcript: {
-      hasTranscript() {
-        return false;
+      hasTranscript(clip: { _fakeClipId?: string; name?: string }) {
+        const key = clip._fakeClipId || clip.name || "default";
+        return Boolean(transcriptStore[key]);
       },
-      async transcribeClipProjectItem() {
-        return false;
+      async transcribeClipProjectItem(
+        clip: { _fakeClipId?: string; name?: string },
+        options?: { language?: string }
+      ) {
+        void options;
+        const key = clip._fakeClipId || clip.name || "default";
+        transcriptStore[key] = JSON.stringify({
+          language: "en-us",
+          speakers: [{ id: "fake-sp", name: "Speaker" }],
+          segments: [
+            {
+              start: 0,
+              duration: 2,
+              language: "en-us",
+              speaker: "fake-sp",
+              words: [
+                {
+                  text: "Hello",
+                  start: 0,
+                  duration: 0.8,
+                  confidence: 1,
+                  eos: false,
+                  tags: [],
+                  type: "word",
+                },
+                {
+                  text: "Premiere.",
+                  start: 0.9,
+                  duration: 0.9,
+                  confidence: 0.9,
+                  eos: true,
+                  tags: [],
+                  type: "word",
+                },
+              ],
+            },
+          ],
+        });
+        return true;
       },
-      async exportToJSON() {
-        return "{}";
+      async exportToJSON(clip: { _fakeClipId?: string; name?: string }) {
+        const key = clip._fakeClipId || clip.name || "default";
+        if (!transcriptStore[key]) {
+          throw new Error("No transcript");
+        }
+        return transcriptStore[key];
       },
       querySupportedLanguages() {
-        return [];
+        return [
+          { displayString: "English (US)", languageCode: "en-US", locale: "en_US" },
+          { displayString: "Français", languageCode: "fr-FR", locale: "fr_FR" },
+        ];
       },
-      isLanguagePackAvailable() {
-        return false;
+      isLanguagePackAvailable(language: string) {
+        return language === "en-US" || language === "fr-FR" || language === "en-us";
       },
-      createImportTextSegmentsAction() {
-        return { run() {} };
+      createImportTextSegmentsAction(
+        textSegments: { _json?: string },
+        clip: { _fakeClipId?: string; name?: string }
+      ) {
+        return {
+          run() {
+            const key = clip._fakeClipId || clip.name || "default";
+            transcriptStore[key] =
+              textSegments._json ||
+              JSON.stringify({
+                language: "en-us",
+                speakers: [{ id: "fake-sp", name: "Speaker" }],
+                segments: [
+                  {
+                    start: 0,
+                    duration: 1,
+                    speaker: "fake-sp",
+                    language: "en-us",
+                    words: [
+                      {
+                        text: "Imported",
+                        start: 0,
+                        duration: 1,
+                        confidence: 1,
+                        eos: true,
+                        tags: [],
+                        type: "word",
+                      },
+                    ],
+                  },
+                ],
+              });
+          },
+        };
       },
-      importFromJSON() {
-        return true;
+      importFromJSON(jsonString: string) {
+        return { _json: jsonString };
       },
     },
     VideoFilterFactory: {

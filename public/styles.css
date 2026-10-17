@@ -529,3 +529,34 @@ button:disabled {
   stroke: var(--mm-accent);
   stroke-width: 2;
 }
+
+.mm-transcript-edit {
+  max-height: 220px;
+  overflow: auto;
+  margin-top: 8px;
+}
+
+.mm-transcript-seg {
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--mm-border-subtle);
+}
+
+.mm-transcript-words {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.mm-word-input {
+  width: auto;
+  min-width: 48px;
+  max-width: 140px;
+  padding: 2px 4px;
+  font-size: 11px;
+  background: var(--mm-bg);
+  border: 1px solid var(--mm-border);
+  border-radius: 2px;
+  color: var(--mm-text);
+}
