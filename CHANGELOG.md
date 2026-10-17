@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.2.2 — 2026-10-17
+
+### Added (WP0)
+
+- `src/testing/fakePremiere/` — in-memory `premierepro` for Node contract tests + scenario factories
+- Contract tests for Project, Sequence, Transactions, Timeline, Markers, Rename, CapabilityService
+- `CapabilityService` runtime probe + Settings → Diagnostic (export JSON)
+- Stable clip IDs (`clipIdentity`) and batched timeline reads + cache (D5/D6)
+- `TransactionService` checks `executeTransaction` boolean return (D9)
+- `npm run verify` (typecheck + lint + test + build + manifest + versions)
+- `docs/api/WP0-apis.md`, `docs/compat.md`, `VERSION`, manual checklist WP0
+
+### Changed
+
+- MarkerService / ClipRenameService route mutations through `TransactionService`
+- Adapter injection hooks for tests (`setPremiereModuleForTests` / `setUxpModuleForTests`)
+
+### Notes
+
+- Types package `@adobe/premierepro` remains independent of host `minVersion` 25.6 — see `docs/compat.md`
+- Live Premiere probes (MOGRT, ComponentParam write, Transcript) still marked partial until WP2+
+
 ## 0.2.1 — 2026-10-16
 
 ### Added
