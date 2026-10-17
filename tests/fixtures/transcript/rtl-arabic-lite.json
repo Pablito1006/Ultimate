@@ -1,0 +1,32 @@
+{
+  "language": "??-??",
+  "speakers": [{ "id": "a1", "name": "Speaker" }],
+  "segments": [
+    {
+      "start": 0,
+      "duration": 2.5,
+      "speaker": "a1",
+      "language": "??-??",
+      "words": [
+        {
+          "text": "مرحبا",
+          "start": 0,
+          "duration": 0.8,
+          "confidence": 0.7,
+          "eos": false,
+          "tags": [],
+          "type": "word"
+        },
+        {
+          "text": "بالعالم",
+          "start": 0.9,
+          "duration": 1.0,
+          "confidence": 0.6,
+          "eos": true,
+          "tags": [],
+          "type": "word"
+        }
+      ]
+    }
+  ]
+}
