@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactElement } from "react";
+import { useCallback, useEffect, useState, type ReactElement } from "react";
 import { toUserMessage } from "../../core/errors/AppError";
 import {
   createMacro,
@@ -6,19 +6,24 @@ import {
   exportMacroJson,
   importMacroJson,
 } from "../../features/macros/macroEngine";
-import { BUILTIN_MACROS, macroRunner } from "../../features/macros/MacroRunner";
-import type { Macro, MacroRunResult } from "../../features/macros/macroTypes";
+import { BUILTIN_MACROS } from "../../features/macros/MacroRunner";
+import {
+  macroPreviewable,
+  type MacroPlanInput,
+} from "../../features/macros/macroPreviewable";
+import type { Macro } from "../../features/macros/macroTypes";
+import { usePreviewSession } from "../../features/preview/usePreviewSession";
 import { settingsService } from "../../services/storage/SettingsService";
 import { Banner } from "../components/Banner";
+import { PlanList } from "../components/preview/PlanList";
+import { PreviewBar } from "../components/preview/PreviewBar";
 
 export function MacrosPanel(): ReactElement {
   const [macros, setMacros] = useState<Macro[]>(BUILTIN_MACROS);
   const [selectedId, setSelectedId] = useState<string>(BUILTIN_MACROS[0]?.id ?? "");
   const [importRaw, setImportRaw] = useState("");
-  const [result, setResult] = useState<MacroRunResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [libError, setLibError] = useState<string | null>(null);
+  const [libMessage, setLibMessage] = useState<string | null>(null);
 
   useEffect(() => {
     void settingsService.load().then((settings) => {
@@ -31,27 +36,18 @@ export function MacrosPanel(): ReactElement {
 
   const selected = macros.find((m) => m.id === selectedId) ?? null;
 
+  const getInput = useCallback((): MacroPlanInput => {
+    if (!selected) {
+      throw new Error("Select a macro first.");
+    }
+    return { macro: selected };
+  }, [selected]);
+
+  const session = usePreviewSession(macroPreviewable, getInput);
+
   async function persist(next: Macro[]): Promise<void> {
     setMacros(next);
     await settingsService.update({ macros: next });
-  }
-
-  async function runSelected(): Promise<void> {
-    if (!selected) {
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    setResult(null);
-    try {
-      const run = await macroRunner.run(selected);
-      setResult(run);
-      setMessage(run.ok ? "Macro completed." : "Macro stopped on failure.");
-    } catch (cause) {
-      setError(toUserMessage(cause));
-    } finally {
-      setBusy(false);
-    }
   }
 
   async function addBlank(): Promise<void> {
@@ -62,6 +58,7 @@ export function MacrosPanel(): ReactElement {
     });
     await persist(macros.concat([next]));
     setSelectedId(next.id);
+    session.clear();
   }
 
   async function dup(): Promise<void> {
@@ -71,6 +68,7 @@ export function MacrosPanel(): ReactElement {
     const copy = duplicateMacro(selected);
     await persist(macros.concat([copy]));
     setSelectedId(copy.id);
+    session.clear();
   }
 
   async function removeSelected(): Promise<void> {
@@ -80,6 +78,7 @@ export function MacrosPanel(): ReactElement {
     const next = macros.filter((m) => m.id !== selected.id);
     await persist(next.length > 0 ? next : BUILTIN_MACROS);
     setSelectedId((next[0] ?? BUILTIN_MACROS[0]).id);
+    session.clear();
   }
 
   async function doImport(): Promise<void> {
@@ -87,19 +86,26 @@ export function MacrosPanel(): ReactElement {
       const macro = importMacroJson(importRaw);
       await persist(macros.concat([macro]));
       setSelectedId(macro.id);
-      setMessage(`Imported “${macro.name}”.`);
+      setLibMessage(`Imported “${macro.name}”.`);
       setImportRaw("");
+      session.clear();
     } catch (cause) {
-      setError(toUserMessage(cause));
+      setLibError(toUserMessage(cause));
     }
   }
 
   return (
     <section>
       <h1 className="mm-panel-title">Macros</h1>
-      <p className="mm-panel-subtitle">Composable atomic Premiere actions with history-friendly runs.</p>
-      {error ? <Banner tone="error">{error}</Banner> : null}
-      {message ? <Banner tone="info">{message}</Banner> : null}
+      <p className="mm-panel-subtitle">
+        Preview the action plan (A), then apply — Apply disabled until Preview.
+      </p>
+      {session.error || libError ? (
+        <Banner tone="error">{session.error || libError}</Banner>
+      ) : null}
+      {session.message || libMessage ? (
+        <Banner tone="info">{session.message || libMessage}</Banner>
+      ) : null}
 
       <div className="mm-card">
         <h2 className="mm-card__title">Library</h2>
@@ -108,7 +114,10 @@ export function MacrosPanel(): ReactElement {
             key={macro.id}
             type="button"
             className={`mm-list-item ${selectedId === macro.id ? "mm-list-item--active" : ""}`}
-            onClick={() => setSelectedId(macro.id)}
+            onClick={() => {
+              setSelectedId(macro.id);
+              session.clear();
+            }}
           >
             <strong>{macro.name}</strong>
             <span>{macro.description || `${macro.actions.length} action(s)`}</span>
@@ -116,44 +125,46 @@ export function MacrosPanel(): ReactElement {
         ))}
       </div>
 
+      <PreviewBar
+        busy={session.busy}
+        canApply={session.canApply}
+        onPreview={() => void session.runPreview()}
+        onApply={() => void session.runApply()}
+        previewLabel="Preview"
+        applyLabel="Apply / Run"
+        levelCNote={session.summary?.levelCNote}
+      />
+
       <div className="mm-actions">
-        <button type="button" className="mm-btn mm-btn--primary" disabled={busy || !selected} onClick={() => void runSelected()}>
-          Run
-        </button>
         <button type="button" className="mm-btn" onClick={() => void addBlank()}>
           New
         </button>
         <button type="button" className="mm-btn" disabled={!selected} onClick={() => void dup()}>
           Duplicate
         </button>
-        <button type="button" className="mm-btn" disabled={!selected} onClick={() => void removeSelected()}>
+        <button
+          type="button"
+          className="mm-btn"
+          disabled={!selected}
+          onClick={() => void removeSelected()}
+        >
           Delete
         </button>
+        {selected ? (
+          <button
+            type="button"
+            className="mm-btn"
+            onClick={() => {
+              void navigator.clipboard.writeText(exportMacroJson(selected));
+              setLibMessage("Macro JSON copied.");
+            }}
+          >
+            Export JSON
+          </button>
+        ) : null}
       </div>
 
-      {selected ? (
-        <div className="mm-card">
-          <h2 className="mm-card__title">Actions</h2>
-          {selected.actions.map((action) => (
-            <div key={action.id} className="mm-row">
-              <span className="mm-row__label">{action.type}</span>
-              <span className="mm-row__value">{JSON.stringify(action.params ?? {})}</span>
-            </div>
-          ))}
-          <div className="mm-actions">
-            <button
-              type="button"
-              className="mm-btn"
-              onClick={() => {
-                void navigator.clipboard.writeText(exportMacroJson(selected));
-                setMessage("Macro JSON copied.");
-              }}
-            >
-              Export JSON
-            </button>
-          </div>
-        </div>
-      ) : null}
+      <PlanList summary={session.summary} />
 
       <div className="mm-card">
         <h2 className="mm-card__title">Import JSON</h2>
@@ -165,18 +176,6 @@ export function MacrosPanel(): ReactElement {
           Import
         </button>
       </div>
-
-      {result ? (
-        <div className="mm-card">
-          <h2 className="mm-card__title">Last run</h2>
-          {result.steps.map((step) => (
-            <div key={step.actionId} className="mm-row">
-              <span className="mm-row__label">{step.ok ? "ok" : "fail"}</span>
-              <span className="mm-row__value">{step.message}</span>
-            </div>
-          ))}
-        </div>
-      ) : null}
     </section>
   );
 }

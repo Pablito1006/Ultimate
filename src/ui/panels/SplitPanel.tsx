@@ -1,11 +1,14 @@
 import { useCallback, useState, type ReactElement } from "react";
-import { toUserMessage } from "../../core/errors/AppError";
 import type { LayoutType } from "../../features/split-screen/layoutEngine";
 import {
-  splitScreenService,
-  type SplitScreenPlan,
-} from "../../features/split-screen/SplitScreenService";
+  splitPreviewable,
+  type SplitPlanInput,
+} from "../../features/split-screen/splitPreviewable";
+import { usePreviewSession } from "../../features/preview/usePreviewSession";
 import { Banner } from "../components/Banner";
+import { AnimatedPreview } from "../components/preview/AnimatedPreview";
+import { PlanList } from "../components/preview/PlanList";
+import { PreviewBar } from "../components/preview/PreviewBar";
 
 const LAYOUTS: LayoutType[] = [
   "2-columns",
@@ -21,52 +24,28 @@ const LAYOUTS: LayoutType[] = [
 
 export function SplitPanel(): ReactElement {
   const [layout, setLayout] = useState<LayoutType>("2x2");
-  const [plan, setPlan] = useState<SplitScreenPlan | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  const compute = useCallback(async () => {
-    setBusy(true);
-    setError(null);
-    setMessage(null);
-    try {
-      setPlan(await splitScreenService.plan(layout));
-    } catch (cause) {
-      setError(toUserMessage(cause));
-    } finally {
-      setBusy(false);
-    }
-  }, [layout]);
-
-  const align = useCallback(async () => {
-    if (!plan) {
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const count = await splitScreenService.alignClipsToPlayhead(plan.cells.length);
-      setMessage(`Aligned ${count} clip(s) to playhead across tracks.`);
-    } catch (cause) {
-      setError(toUserMessage(cause));
-    } finally {
-      setBusy(false);
-    }
-  }, [plan]);
+  const getInput = useCallback((): SplitPlanInput => ({ layout, gap: 8 }), [layout]);
+  const session = usePreviewSession(splitPreviewable, getInput);
 
   return (
     <section>
       <h1 className="mm-panel-title">Split Screen</h1>
-      <p className="mm-panel-subtitle">Calculate layouts and align clips across tracks.</p>
-      {error ? <Banner tone="error">{error}</Banner> : null}
-      {message ? <Banner tone="info">{message}</Banner> : null}
-      {plan ? <Banner tone="warn">{plan.limitation}</Banner> : null}
+      <p className="mm-panel-subtitle">
+        Calculate layouts (A+B), then align clips — crop/scale still WP5.
+      </p>
+      {session.error ? <Banner tone="error">{session.error}</Banner> : null}
+      {session.message ? <Banner tone="info">{session.message}</Banner> : null}
 
       <div className="mm-card">
         <label className="mm-field">
           <span>Layout</span>
-          <select value={layout} onChange={(e) => setLayout(e.target.value as LayoutType)}>
+          <select
+            value={layout}
+            onChange={(e) => {
+              setLayout(e.target.value as LayoutType);
+              session.clear();
+            }}
+          >
             {LAYOUTS.map((item) => (
               <option key={item} value={item}>
                 {item}
@@ -76,37 +55,18 @@ export function SplitPanel(): ReactElement {
         </label>
       </div>
 
-      <div className="mm-actions">
-        <button type="button" className="mm-btn" disabled={busy} onClick={() => void compute()}>
-          Calculate
-        </button>
-        <button
-          type="button"
-          className="mm-btn mm-btn--primary"
-          disabled={busy || !plan}
-          onClick={() => void align()}
-        >
-          Align to playhead
-        </button>
-      </div>
+      <PreviewBar
+        busy={session.busy}
+        canApply={session.canApply}
+        onPreview={() => void session.runPreview()}
+        onApply={() => void session.runApply()}
+        previewLabel="Preview"
+        applyLabel="Align to playhead"
+        levelCNote={session.summary?.levelCNote}
+      />
 
-      {plan ? (
-        <div className="mm-card">
-          <h2 className="mm-card__title">
-            Cells ({plan.cells.length}) · {plan.config.width}×{plan.config.height}
-          </h2>
-          {plan.cells.map((cell) => (
-            <div key={cell.index} className="mm-row">
-              <span className="mm-row__label">
-                #{cell.index + 1} {plan.clipNames[cell.index] || "—"}
-              </span>
-              <span className="mm-row__value">
-                {cell.x},{cell.y} {cell.width}×{cell.height}
-              </span>
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <PlanList summary={session.summary} />
+      <AnimatedPreview visual={session.visual} />
     </section>
   );
 }

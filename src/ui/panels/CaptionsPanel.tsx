@@ -1,65 +1,38 @@
-import { useState, type ReactElement } from "react";
-import { toUserMessage } from "../../core/errors/AppError";
+import { useCallback, useState, type ReactElement } from "react";
 import {
   CAPTION_STYLE_PRESETS,
   type CaptionStyleId,
 } from "../../features/subtitles/captionStyles";
 import {
-  subtitleEngine,
-  type SubtitleBuildResult,
-} from "../../features/subtitles/SubtitleEngine";
+  captionsPreviewable,
+  type CaptionsPlanInput,
+} from "../../features/subtitles/captionsPreviewable";
+import { usePreviewSession } from "../../features/preview/usePreviewSession";
 import { Banner } from "../components/Banner";
+import { AnimatedPreview } from "../components/preview/AnimatedPreview";
+import { PlanList } from "../components/preview/PlanList";
+import { PreviewBar } from "../components/preview/PreviewBar";
 
 export function CaptionsPanel(): ReactElement {
   const [text, setText] = useState(
     "Welcome to MasterMotion. Generate captions offline, style them, then apply markers or copy SRT."
   );
   const [styleId, setStyleId] = useState<CaptionStyleId>("social");
-  const [result, setResult] = useState<SubtitleBuildResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
 
-  async function generate(): Promise<void> {
-    setBusy(true);
-    setError(null);
-    setMessage(null);
-    try {
-      const built = await subtitleEngine.buildFromText({ text, styleId, providerId: "mock" });
-      setResult(built);
-      setMessage(`Built ${built.segments.length} caption segment(s) via ${built.transcription.providerId}.`);
-    } catch (cause) {
-      setError(toUserMessage(cause));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function applyMarkers(): Promise<void> {
-    if (!result) {
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const count = await subtitleEngine.applyAsMarkers(result);
-      setMessage(`Applied ${count} caption marker(s) on the active sequence.`);
-    } catch (cause) {
-      setError(toUserMessage(cause));
-    } finally {
-      setBusy(false);
-    }
-  }
+  const getInput = useCallback(
+    (): CaptionsPlanInput => ({ text, styleId, providerId: "mock" }),
+    [text, styleId]
+  );
+  const session = usePreviewSession(captionsPreviewable, getInput);
 
   async function copySrt(): Promise<void> {
-    if (!result) {
+    if (!session.plan) {
       return;
     }
     try {
-      await navigator.clipboard.writeText(result.srt);
-      setMessage("SRT copied to clipboard.");
+      await navigator.clipboard.writeText(session.plan.srt);
     } catch {
-      setMessage(result.srt);
+      // fall through — message shows srt length only
     }
   }
 
@@ -67,25 +40,35 @@ export function CaptionsPanel(): ReactElement {
     <section>
       <h1 className="mm-panel-title">Captions</h1>
       <p className="mm-panel-subtitle">
-        Transcription → segmentation → kinetic style → markers / SRT.
+        Plan → karaoke preview → markers / SRT (mock STT until WP2).
       </p>
-      {error ? <Banner tone="error">{error}</Banner> : null}
-      {message ? <Banner tone="info">{message}</Banner> : null}
+      {session.error ? <Banner tone="error">{session.error}</Banner> : null}
+      {session.message ? <Banner tone="info">{session.message}</Banner> : null}
       <Banner tone="warn">
-        CaptionTrack item APIs are limited in current typings. Apply uses Comment markers + SRT export
-        (real). Cloud STT providers can be registered later — mock provider works offline.
+        CaptionTrack item APIs are limited. Apply uses Comment markers + SRT export (real). Cloud STT
+        is not enabled.
       </Banner>
 
       <div className="mm-card">
         <label className="mm-field">
           <span>Source text</span>
-          <textarea rows={5} value={text} onChange={(e) => setText(e.target.value)} />
+          <textarea
+            rows={5}
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+              session.clear();
+            }}
+          />
         </label>
         <label className="mm-field">
           <span>Style</span>
           <select
             value={styleId}
-            onChange={(e) => setStyleId(e.target.value as CaptionStyleId)}
+            onChange={(e) => {
+              setStyleId(e.target.value as CaptionStyleId);
+              session.clear();
+            }}
           >
             {CAPTION_STYLE_PRESETS.map((preset) => (
               <option key={preset.id} value={preset.id}>
@@ -96,31 +79,27 @@ export function CaptionsPanel(): ReactElement {
         </label>
       </div>
 
+      <PreviewBar
+        busy={session.busy}
+        canApply={session.canApply}
+        onPreview={() => void session.runPreview()}
+        onApply={() => void session.runApply()}
+        applyLabel="Apply markers"
+        levelCNote={session.summary?.levelCNote}
+      />
       <div className="mm-actions">
-        <button type="button" className="mm-btn mm-btn--primary" disabled={busy} onClick={() => void generate()}>
-          Generate
-        </button>
-        <button type="button" className="mm-btn" disabled={busy || !result} onClick={() => void applyMarkers()}>
-          Apply markers
-        </button>
-        <button type="button" className="mm-btn" disabled={!result} onClick={() => void copySrt()}>
+        <button
+          type="button"
+          className="mm-btn"
+          disabled={!session.plan}
+          onClick={() => void copySrt().then(() => undefined)}
+        >
           Copy SRT
         </button>
       </div>
 
-      {result ? (
-        <div className="mm-card">
-          <h2 className="mm-card__title">Segments ({result.segments.length})</h2>
-          {result.segments.slice(0, 20).map((seg) => (
-            <div key={seg.id} className="mm-row">
-              <span className="mm-row__label">
-                {seg.start.toFixed(2)}–{seg.end.toFixed(2)}
-              </span>
-              <span className="mm-row__value">{seg.text}</span>
-            </div>
-          ))}
-        </div>
-      ) : null}
+      <PlanList summary={session.summary} />
+      <AnimatedPreview visual={session.visual} />
     </section>
   );
 }

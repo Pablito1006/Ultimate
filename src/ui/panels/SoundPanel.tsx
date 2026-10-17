@@ -1,69 +1,63 @@
-import { useState, type ReactElement } from "react";
+import { useCallback, useState, type ReactElement } from "react";
 import { toUserMessage } from "../../core/errors/AppError";
+import { soundDesignService } from "../../features/audio/SoundDesignService";
 import {
-  soundDesignService,
-  type SoundDesignReport,
-} from "../../features/audio/SoundDesignService";
+  soundPreviewable,
+  type SoundPlanInput,
+} from "../../features/audio/soundPreviewable";
+import { usePreviewSession } from "../../features/preview/usePreviewSession";
 import { Banner } from "../components/Banner";
+import { PlanList } from "../components/preview/PlanList";
+import { PreviewBar } from "../components/preview/PreviewBar";
+import { TimelineMiniMap } from "../components/preview/TimelineMiniMap";
 
 export function SoundPanel(): ReactElement {
-  const [report, setReport] = useState<SoundDesignReport | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
   const [trackIndex, setTrackIndex] = useState(0);
+  const [muteError, setMuteError] = useState<string | null>(null);
+  const [muteMessage, setMuteMessage] = useState<string | null>(null);
+  const [muteBusy, setMuteBusy] = useState(false);
 
-  async function analyze(): Promise<void> {
-    setBusy(true);
-    setError(null);
-    setMessage(null);
-    try {
-      setReport(await soundDesignService.analyzeAndSuggest());
-    } catch (cause) {
-      setError(toUserMessage(cause));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function applyMarkers(): Promise<void> {
-    if (!report) {
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    try {
-      const count = await soundDesignService.applySuggestionMarkers(report.suggestions);
-      setMessage(`Placed ${count} SFX suggestion marker(s). Review before importing media.`);
-    } catch (cause) {
-      setError(toUserMessage(cause));
-    } finally {
-      setBusy(false);
-    }
-  }
+  const getInput = useCallback((): SoundPlanInput => ({}), []);
+  const session = usePreviewSession(soundPreviewable, getInput);
 
   async function mute(mute: boolean): Promise<void> {
-    setBusy(true);
-    setError(null);
+    setMuteBusy(true);
+    setMuteError(null);
     try {
       await soundDesignService.setAudioTrackMute(trackIndex, mute);
-      setMessage(`${mute ? "Muted" : "Unmuted"} audio track ${trackIndex}.`);
+      setMuteMessage(`${mute ? "Muted" : "Unmuted"} audio track ${trackIndex}.`);
     } catch (cause) {
-      setError(toUserMessage(cause));
+      setMuteError(toUserMessage(cause));
     } finally {
-      setBusy(false);
+      setMuteBusy(false);
     }
   }
+
+  const timelinePayload =
+    session.visual?.kind === "timeline"
+      ? (session.visual.payload as {
+          duration: number;
+          playhead: number;
+          clips: Array<{ start: number; end: number; track: number; label: string }>;
+          markers: Array<{ time: number; label: string }>;
+        })
+      : null;
 
   return (
     <section>
       <h1 className="mm-panel-title">Sound</h1>
-      <p className="mm-panel-subtitle">Event analysis, SFX suggestions, and audio track mute helpers.</p>
-      {error ? <Banner tone="error">{error}</Banner> : null}
-      {message ? <Banner tone="info">{message}</Banner> : null}
+      <p className="mm-panel-subtitle">
+        Preview SFX suggestions (A), then mark for approval — never auto-inserts media.
+      </p>
+      {session.error || muteError ? (
+        <Banner tone="error">{session.error || muteError}</Banner>
+      ) : null}
+      {session.message || muteMessage ? (
+        <Banner tone="info">{session.message || muteMessage}</Banner>
+      ) : null}
       <Banner tone="warn">
-        Suggestions never insert media silently. Markers are placed for approval. Advanced DSP
-        (loudness, ducking) is not claimed without Premiere API support.
+        Suggestions never insert media silently. Advanced DSP is not claimed without Premiere API
+        support.
       </Banner>
 
       <div className="mm-card">
@@ -78,51 +72,33 @@ export function SoundPanel(): ReactElement {
         </label>
       </div>
 
+      <PreviewBar
+        busy={session.busy}
+        canApply={session.canApply && (session.summary?.counts.suggestions ?? 0) > 0}
+        onPreview={() => void session.runPreview()}
+        onApply={() => void session.runApply()}
+        previewLabel="Preview"
+        applyLabel="Mark suggestions"
+        levelCNote={session.summary?.levelCNote}
+      />
       <div className="mm-actions">
-        <button type="button" className="mm-btn mm-btn--primary" disabled={busy} onClick={() => void analyze()}>
-          Analyze & suggest
-        </button>
-        <button type="button" className="mm-btn" disabled={busy || !report} onClick={() => void applyMarkers()}>
-          Mark suggestions
-        </button>
-        <button type="button" className="mm-btn" disabled={busy} onClick={() => void mute(true)}>
+        <button type="button" className="mm-btn" disabled={muteBusy} onClick={() => void mute(true)}>
           Mute track
         </button>
-        <button type="button" className="mm-btn" disabled={busy} onClick={() => void mute(false)}>
+        <button type="button" className="mm-btn" disabled={muteBusy} onClick={() => void mute(false)}>
           Unmute track
         </button>
       </div>
 
-      {report ? (
-        <>
-          <div className="mm-card">
-            <h2 className="mm-card__title">Events ({report.events.length})</h2>
-            {report.events.slice(0, 25).map((event) => (
-              <div key={event.id} className="mm-row">
-                <span className="mm-row__label">{event.time.toFixed(2)}s</span>
-                <span className="mm-row__value">
-                  {event.type}
-                  {event.label ? ` · ${event.label}` : ""}
-                </span>
-              </div>
-            ))}
-          </div>
-          <div className="mm-card">
-            <h2 className="mm-card__title">Suggestions ({report.suggestions.length})</h2>
-            {report.suggestions.length === 0 ? (
-              <p className="mm-empty">No suggestions above threshold.</p>
-            ) : (
-              report.suggestions.map((s) => (
-                <div key={`${s.eventId}_${s.sfxId}`} className="mm-row">
-                  <span className="mm-row__label">{s.time.toFixed(2)}s</span>
-                  <span className="mm-row__value">
-                    {s.sfxName} · {(s.score * 100).toFixed(0)}% · {s.reason}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </>
+      <PlanList summary={session.summary} />
+      {timelinePayload ? (
+        <TimelineMiniMap
+          title="Suggestion map"
+          duration={timelinePayload.duration}
+          playhead={timelinePayload.playhead}
+          clips={timelinePayload.clips}
+          markers={timelinePayload.markers}
+        />
       ) : null}
     </section>
   );
