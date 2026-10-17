@@ -27,4 +27,9 @@ Légende : ✅ disponible · ⚠️ partiel / version supérieure · ❌ indispo
 | ClipProjectItem proxys | 🧪 | 🧪 | 🧪 | 🧪 |
 | IA réseau | ❌ défaut off | ❌ | ❌ | ❌ (consentement WP12) |
 
-Mise à jour : WP0 (2026-10-17). Actualiser à chaque chantier.
+| Cadre d’aperçu A (Rename/Split/Captions/Sound/Macros) | ✅ | ✅ | ✅ | ✅ |
+| Aperçu B Rename (flip) / Split (grille SVG) | ✅ | ✅ | ✅ | ✅ |
+| Aperçu B Captions karaoke | ✅ | ✅ | ✅ | ✅ |
+| Aperçu C (copie séquence) | ❌ WP1 | ❌ | ❌ | ❌ |
+
+Mise à jour : WP1 (2026-10-17). Actualiser à chaque chantier.

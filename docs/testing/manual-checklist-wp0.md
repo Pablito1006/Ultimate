@@ -1,13 +1,22 @@
-# Checklist manuelle WP0 (Premiere Pro)
+# Checklist manuelle WP0 + WP1 (Premiere Pro)
 
-À valider dans Premiere Pro 25.6+ (pas couvert par le faux module) :
+## WP0
 
 - [ ] Panneau charge sans erreur UXP
 - [ ] Dashboard affiche version host / projet / séquence
 - [ ] Timeline → Analyze lit les clips de la séquence active
-- [ ] Settings → Diagnostic → Run diagnostic : points verts/orange/rouges cohérents
-- [ ] Export JSON diagnostic (presse-papiers) sans chemins sensibles
-- [ ] Une transaction (ex. rename ou marker) apparaît comme une seule étape Annuler
-- [ ] Après une transaction refusée / sans effet : message d’erreur explicite (pas de faux succès)
+- [ ] Settings → Diagnostic → Run diagnostic
+- [ ] Export JSON diagnostic sans chemins sensibles
+- [ ] Une transaction apparaît comme une seule étape Annuler
 
-Hors WP0 (reportés) : transcription native, MOGRT, ComponentParam écriture live.
+## WP1 — Aperçu
+
+- [ ] Rename : Preview calcule le plan ; Apply désactivé avant Preview ; flip B visible
+- [ ] Split : Preview montre la grille SVG ; Align to playhead après plan seulement
+- [ ] Captions : Preview → segments + karaoke B ; Apply markers après plan
+- [ ] Sound : Preview suggestions ; Mark suggestions après plan ; mute hors plan OK
+- [ ] Macros : Preview liste les étapes ; Apply/Run après plan
+- [ ] Ctrl/Cmd+Z annule une apply (undo natif Premiere)
+- [ ] Changer un paramètre après Preview invalide le plan (Apply re-désactivé)
+
+Hors WP1 : crop/scale split (WP5), transcription native (WP2), essai C copie séquence.
