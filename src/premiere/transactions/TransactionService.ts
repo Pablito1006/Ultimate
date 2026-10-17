@@ -9,11 +9,20 @@ export interface TransactionResult<T> {
   value: T;
 }
 
+export interface ExecuteResult {
+  /** True when Premiere reported the transaction as committed. */
+  committed: boolean;
+  label: string;
+}
+
 /**
  * Centralizes Premiere project mutations.
  * Never call executeTransaction / lockedAccess from React components.
  *
- * @see Project.executeTransaction — since 25.6
+ * After a successful execute(), callers MUST re-read project/sequence state
+ * (verify) — Adobe has reported transactions that return success without persisting.
+ *
+ * @see Project.executeTransaction — since 25.6 — returns boolean
  * @see Project.lockedAccess — since 25.6
  */
 export class TransactionService {
@@ -56,20 +65,37 @@ export class TransactionService {
   }
 
   /**
+   * Shared D9 check for call sites that must keep `project.executeTransaction`
+   * visible to `@adobe/eslint-plugin-premierepro` (require-execute-transaction).
+   */
+  assertCommitted(committed: boolean, label: string): void {
+    if (!committed) {
+      Logger.error("executeTransaction returned false", { label });
+      throw new TransactionError(
+        `Transaction did not commit: ${label}. Re-read the project state; nothing may have been written.`,
+        { details: { committed: false, label } }
+      );
+    }
+    Logger.info("Transaction executed", { label, committed: true });
+  }
+
+  /**
    * Runs a mutable Premiere transaction inside lockedAccess with an undo label.
+   * Checks the boolean return of executeTransaction (D9).
    * Matches Adobe ESLint recommendations (prefer-locked-access-wrapper, prefer-undo-string).
    */
   async execute(
     project: Project,
     label: string,
     callback: TransactionCallback
-  ): Promise<void> {
+  ): Promise<ExecuteResult> {
     try {
       let error: unknown;
+      let committed = false;
 
       project.lockedAccess(() => {
         try {
-          void project.executeTransaction(callback, label);
+          committed = project.executeTransaction(callback, label);
         } catch (cause) {
           error = cause;
         }
@@ -79,9 +105,13 @@ export class TransactionService {
         throw error;
       }
 
-      Logger.info("Transaction executed", { label });
+      this.assertCommitted(committed, label);
+      return { committed: true, label };
     } catch (cause) {
       Logger.error("executeTransaction failed", { label, cause: String(cause) });
+      if (cause instanceof TransactionError) {
+        throw cause;
+      }
       throw new TransactionError(`Transaction failed: ${label}`, { cause });
     }
   }
@@ -89,9 +119,9 @@ export class TransactionService {
   async withActiveProject(
     label: string,
     callback: TransactionCallback
-  ): Promise<void> {
+  ): Promise<ExecuteResult> {
     const project = await projectService.requireActiveProject();
-    await this.execute(project, label, callback);
+    return this.execute(project, label, callback);
   }
 }
 

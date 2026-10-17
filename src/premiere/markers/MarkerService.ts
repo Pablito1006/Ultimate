@@ -2,8 +2,11 @@ import type { Project, Sequence } from "@adobe/premierepro";
 import { PremiereError } from "../../core/errors/AppError";
 import { Logger } from "../../core/logging/Logger";
 import { getPremiereModule } from "../adapters/premiereModule";
+import { guidToString } from "../clips/clipIdentity";
 import { projectService } from "../project/ProjectService";
 import { sequenceService } from "../sequence/SequenceService";
+import { timelineService } from "../timeline/TimelineService";
+import { transactionService } from "../transactions/TransactionService";
 
 export class MarkerService {
   async addMarkerAtPlayhead(options: {
@@ -38,9 +41,11 @@ export class MarkerService {
       const markers = await ppro.Markers.getMarkers(sequence);
       const start = ppro.TickTime.createWithSeconds(startSeconds);
       const duration = ppro.TickTime.createWithSeconds(durationSeconds);
+      const label = `MasterMotion: Add marker ${options.name}`;
 
+      // Adobe ESLint requires executeTransaction visible in this file; boolean checked via TransactionService (D9).
       project.lockedAccess(() => {
-        project.executeTransaction((ca) => {
+        const committed = project.executeTransaction((ca) => {
           const action = markers.createAddMarkerAction(
             options.name,
             options.markerType || "Comment",
@@ -49,8 +54,11 @@ export class MarkerService {
             options.comments || ""
           );
           ca.addAction(action);
-        }, `MasterMotion: Add marker ${options.name}`);
+        }, label);
+        transactionService.assertCommitted(committed, label);
       });
+
+      timelineService.invalidateCache(guidToString(sequence.guid));
     } catch (cause) {
       Logger.error("addMarker failed", { cause: String(cause) });
       if (cause instanceof PremiereError) {
@@ -67,9 +75,10 @@ export class MarkerService {
   ): Promise<void> {
     const ppro = getPremiereModule();
     const markers = await ppro.Markers.getMarkers(sequence);
+    const label = "MasterMotion: Add caption markers";
 
     project.lockedAccess(() => {
-      project.executeTransaction((ca) => {
+      const committed = project.executeTransaction((ca) => {
         for (let i = 0; i < items.length; i += 1) {
           const item = items[i];
           const action = markers.createAddMarkerAction(
@@ -81,8 +90,11 @@ export class MarkerService {
           );
           ca.addAction(action);
         }
-      }, "MasterMotion: Add caption markers");
+      }, label);
+      transactionService.assertCommitted(committed, label);
     });
+
+    timelineService.invalidateCache(guidToString(sequence.guid));
   }
 }
 

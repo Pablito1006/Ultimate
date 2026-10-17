@@ -5,6 +5,9 @@ import type { RenamePreviewItem } from "../../features/batch-renaming/renameEngi
 import { getPremiereModule } from "../adapters/premiereModule";
 import { projectService } from "../project/ProjectService";
 import { sequenceService } from "../sequence/SequenceService";
+import { timelineService } from "../timeline/TimelineService";
+import { transactionService } from "../transactions/TransactionService";
+import { guidToString } from "./clipIdentity";
 
 /**
  * Applies rename preview results to selected ProjectItems via createSetNameAction.
@@ -30,20 +33,30 @@ export class ClipRenameService {
         byName.set(item.name, list);
       }
 
+      const planned: Array<{ target: (typeof items)[number]; after: string }> = [];
+      for (let i = 0; i < changed.length; i += 1) {
+        const preview = changed[i];
+        const bucket = byName.get(preview.before);
+        const target = bucket && bucket.length > 0 ? bucket.shift() : undefined;
+        if (target) {
+          planned.push({ target, after: preview.after });
+        }
+      }
+
+      if (planned.length === 0) {
+        return 0;
+      }
+
+      const label = "MasterMotion: Batch rename";
       let applied = 0;
       project.lockedAccess(() => {
-        project.executeTransaction((ca) => {
-          for (let i = 0; i < changed.length; i += 1) {
-            const preview = changed[i];
-            const bucket = byName.get(preview.before);
-            const target = bucket && bucket.length > 0 ? bucket.shift() : undefined;
-            if (!target) {
-              continue;
-            }
-            ca.addAction(target.createSetNameAction(preview.after));
+        const committed = project.executeTransaction((ca) => {
+          for (let i = 0; i < planned.length; i += 1) {
+            ca.addAction(planned[i].target.createSetNameAction(planned[i].after));
             applied += 1;
           }
-        }, "MasterMotion: Batch rename");
+        }, label);
+        transactionService.assertCommitted(committed, label);
       });
 
       return applied;
@@ -66,7 +79,6 @@ export class ClipRenameService {
 
     try {
       const planned = renames.slice();
-      let applied = 0;
       const videoCount = await sequence.getVideoTrackCount();
       const matched: Array<{ item: VideoClipTrackItem; newName: string }> = [];
 
@@ -87,15 +99,19 @@ export class ClipRenameService {
         return 0;
       }
 
+      const label = "MasterMotion: Rename timeline clips";
+      let applied = 0;
       project.lockedAccess(() => {
-        project.executeTransaction((ca) => {
+        const committed = project.executeTransaction((ca) => {
           for (let i = 0; i < matched.length; i += 1) {
             ca.addAction(matched[i].item.createSetNameAction(matched[i].newName));
             applied += 1;
           }
-        }, "MasterMotion: Rename timeline clips");
+        }, label);
+        transactionService.assertCommitted(committed, label);
       });
 
+      timelineService.invalidateCache(guidToString(sequence.guid));
       return applied;
     } catch (cause) {
       Logger.error("Timeline clip rename failed", { cause: String(cause) });
