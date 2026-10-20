@@ -10,6 +10,7 @@ import {
   type SoundSuggestion,
   type TimelineEvent,
 } from "./soundDesignEngine";
+import { getSfxCatalog } from "./sfxCatalog";
 
 export interface SoundDesignReport {
   events: TimelineEvent[];
@@ -40,7 +41,7 @@ export class SoundDesignService {
       });
     }
 
-    const suggestions = suggestSoundEffects(events);
+    const suggestions = suggestSoundEffects(events, getSfxCatalog());
     return { events, suggestions };
   }
 

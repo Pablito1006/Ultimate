@@ -4,10 +4,13 @@ export type LayoutType =
   | "3-columns"
   | "3-rows"
   | "2x2"
+  | "2x3"
+  | "3x2"
   | "3x3"
   | "pip"
   | "main-sidebar"
   | "cinema"
+  | "asymmetric-l"
   | "custom";
 
 export interface SplitScreenConfig {
@@ -46,6 +49,10 @@ function gridDims(layout: LayoutType, customCols?: number, customRows?: number):
       return { cols: 1, rows: 3 };
     case "2x2":
       return { cols: 2, rows: 2 };
+    case "2x3":
+      return { cols: 3, rows: 2 };
+    case "3x2":
+      return { cols: 2, rows: 3 };
     case "3x3":
       return { cols: 3, rows: 3 };
     case "pip":
@@ -54,6 +61,8 @@ function gridDims(layout: LayoutType, customCols?: number, customRows?: number):
       return { cols: 2, rows: 1 };
     case "cinema":
       return { cols: 2, rows: 1 };
+    case "asymmetric-l":
+      return { cols: 2, rows: 2 };
     case "custom":
       return {
         cols: Math.max(1, customCols ?? 2),
@@ -126,6 +135,30 @@ export function calculateGridLayout(config: SplitScreenConfig): LayoutCell[] {
         y: originY + bar,
         width: Math.round((innerW - config.gap) / 2),
         height: innerH - bar * 2,
+      },
+    ];
+    return cells.slice(0, Math.max(1, config.clipCount));
+  }
+
+  if (config.layout === "asymmetric-l") {
+    const mainW = Math.round(innerW * 0.62);
+    const sideW = innerW - mainW - config.gap;
+    const halfH = Math.round((innerH - config.gap) / 2);
+    const cells: LayoutCell[] = [
+      { index: 0, x: originX, y: originY, width: mainW, height: innerH },
+      {
+        index: 1,
+        x: originX + mainW + config.gap,
+        y: originY,
+        width: sideW,
+        height: halfH,
+      },
+      {
+        index: 2,
+        x: originX + mainW + config.gap,
+        y: originY + halfH + config.gap,
+        width: sideW,
+        height: innerH - halfH - config.gap,
       },
     ];
     return cells.slice(0, Math.max(1, config.clipCount));

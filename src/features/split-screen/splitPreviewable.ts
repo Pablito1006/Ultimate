@@ -1,11 +1,18 @@
-import { transactionService } from "../../premiere/transactions/TransactionService";
-import { getPremiereModule } from "../../premiere/adapters/premiereModule";
-import { projectService } from "../../premiere/project/ProjectService";
-import { sequenceService } from "../../premiere/sequence/SequenceService";
-import { timelineService } from "../../premiere/timeline/TimelineService";
 import type { VideoClipTrackItem } from "@adobe/premierepro";
 import { PremiereError } from "../../core/errors/AppError";
 import { Logger } from "../../core/logging/Logger";
+import { getPremiereModule } from "../../premiere/adapters/premiereModule";
+import { componentService } from "../../premiere/components/ComponentService";
+import { projectService } from "../../premiere/project/ProjectService";
+import { sequenceService } from "../../premiere/sequence/SequenceService";
+import { timelineService } from "../../premiere/timeline/TimelineService";
+import { transactionService } from "../../premiere/transactions/TransactionService";
+import {
+  cellToTransform,
+  transformsMatch,
+  type CellTransform,
+  type FitMode,
+} from "../compositing/geometryTransform";
 import { assertPlanReady } from "../preview/guards";
 import type { ApplyReport, PreviewablePlan, PreviewSummary, PreviewVisual, VerifyReport } from "../preview/types";
 import {
@@ -18,6 +25,19 @@ import {
 export interface SplitPlanInput {
   layout: LayoutType;
   gap?: number;
+  border?: number;
+  margin?: number;
+  fitMode?: FitMode;
+  alignStarts?: boolean;
+}
+
+export interface SplitClipBinding {
+  clipId: string;
+  clipName: string;
+  trackIndex: number;
+  start: number;
+  cellIndex: number;
+  transform: CellTransform;
 }
 
 export interface SplitPlan {
@@ -25,7 +45,10 @@ export interface SplitPlan {
   config: SplitScreenConfig;
   clipNames: string[];
   clipIds: string[];
+  bindings: SplitClipBinding[];
   playheadSeconds: number;
+  fitMode: FitMode;
+  alignStarts: boolean;
   limitation: string;
 }
 
@@ -33,28 +56,45 @@ export interface SplitPlan {
 export function planSplitPure(
   layout: LayoutType,
   frame: { width: number; height: number },
-  clipNames: string[],
-  gap = 8
-): Pick<SplitPlan, "cells" | "config" | "clipNames" | "limitation"> {
-  const clipCount = Math.max(1, Math.min(clipNames.length || 2, 9));
+  clips: Array<{ id: string; name: string; trackIndex: number; start: number }>,
+  options: { gap?: number; border?: number; margin?: number; fitMode?: FitMode } = {}
+): Pick<SplitPlan, "cells" | "config" | "clipNames" | "clipIds" | "bindings" | "fitMode" | "limitation"> {
+  const gap = options.gap ?? 8;
+  const border = options.border ?? 0;
+  const margin = options.margin ?? 0;
+  const fitMode = options.fitMode ?? "fit-width";
+  const clipCount = Math.max(1, Math.min(clips.length || 2, 9));
   const config: SplitScreenConfig = {
     layout,
     gap,
-    border: 0,
+    border,
     padding: 0,
-    margin: 0,
+    margin,
     width: frame.width || 1920,
     height: frame.height || 1080,
     clipCount,
   };
   const cells = calculateGridLayout(config);
+  const used = clips.slice(0, cells.length);
+  const bindings: SplitClipBinding[] = used.map((clip, i) => ({
+    clipId: clip.id,
+    clipName: clip.name,
+    trackIndex: clip.trackIndex,
+    start: clip.start,
+    cellIndex: i,
+    transform: cellToTransform(cells[i], { width: config.width, height: config.height }, fitMode),
+  }));
+
   return {
     cells,
     config,
-    clipNames: clipNames.slice(0, cells.length),
+    clipNames: used.map((c) => c.name),
+    clipIds: used.map((c) => c.id),
+    bindings,
+    fitMode,
     limitation:
-      "Layout geometry is calculated. Aligning clip starts across tracks is applied when possible. " +
-      "Per-clip crop/scale requires Motion effect parameters or a MOGRT — not simulated (WP5).",
+      "WP5: position + scale + crop applied via Motion/Opacity component params when available. " +
+      "Rounded corners / drop shadow: unavailable unless a writable filter exposes them.",
   };
 }
 
@@ -63,39 +103,48 @@ export const splitPreviewable: PreviewablePlan<SplitPlanInput, SplitPlan> = {
   label: "Split screen",
 
   async plan(input) {
-    const analysis = await timelineService.analyzeActive();
+    const analysis = await timelineService.analyzeActive({ bypassCache: true });
     const videoClips = analysis.clips.filter((c) => c.trackKind === "video");
     const pure = planSplitPure(
       input.layout,
       { width: analysis.frameWidth, height: analysis.frameHeight },
-      videoClips.map((c) => c.name),
-      input.gap ?? 8
+      videoClips.map((c) => ({
+        id: c.id,
+        name: c.name,
+        trackIndex: c.trackIndex,
+        start: c.start,
+      })),
+      {
+        gap: input.gap ?? 8,
+        border: input.border ?? 0,
+        margin: input.margin ?? 0,
+        fitMode: input.fitMode ?? "fit-width",
+      }
     );
     return {
       ...pure,
-      clipIds: videoClips.slice(0, pure.cells.length).map((c) => c.id),
       playheadSeconds: analysis.playerPosition,
+      alignStarts: input.alignStarts !== false,
     };
   },
 
   describe(plan): PreviewSummary {
     return {
-      title: "Split screen",
-      headline: `${plan.cells.length} cell(s) · ${plan.config.layout} · ${plan.config.width}×${plan.config.height}`,
+      title: "Split screen (réel)",
+      headline: `${plan.cells.length} cellule(s) · ${plan.config.layout} · ${plan.config.width}×${plan.config.height} · ${plan.fitMode}`,
       counts: {
         cells: plan.cells.length,
-        clips: plan.clipNames.length,
+        clips: plan.bindings.length,
       },
       warnings: [plan.limitation],
-      estimatedMs: Math.max(80, plan.cells.length * 40),
+      estimatedMs: Math.max(100, plan.bindings.length * 60),
       levels: ["A", "B"],
-      levelCNote:
-        "Level C trial on a sequence copy is not wired in WP1 (createSubsequence exists but cleanup policy pending).",
-      changes: plan.cells.map((cell) => ({
-        id: `cell_${cell.index}`,
-        label: `#${cell.index + 1} ${plan.clipNames[cell.index] || "—"}`,
-        before: "full frame",
-        after: `${cell.x},${cell.y} ${cell.width}×${cell.height}`,
+      levelCNote: "Level C (copie séquence) non disponible en WP5.",
+      changes: plan.bindings.map((b) => ({
+        id: b.clipId,
+        label: `#${b.cellIndex + 1} ${b.clipName}`,
+        before: "plein cadre",
+        after: `pos ${Math.round(b.transform.positionX)},${Math.round(b.transform.positionY)} · scale ${b.transform.scale.toFixed(1)}% · ${Math.round(b.transform.resultWidth)}×${Math.round(b.transform.resultHeight)}`,
       })),
     };
   },
@@ -116,46 +165,159 @@ export const splitPreviewable: PreviewablePlan<SplitPlanInput, SplitPlan> = {
 
   async apply(plan): Promise<ApplyReport> {
     assertPlanReady(plan, this.label);
-    const count = await alignClipsToPlayhead(plan.cells.length);
+    let aligned = 0;
+    if (plan.alignStarts) {
+      aligned = await alignClipsToPlayhead(plan.bindings.length);
+    }
+
+    const project = await projectService.requireActiveProject();
+    let transformed = 0;
+    const failures: string[] = [];
+
+    for (const binding of plan.bindings) {
+      try {
+        const item = await timelineService.getVideoClipTrackItem(
+          binding.trackIndex,
+          binding.clipName,
+          plan.alignStarts ? plan.playheadSeconds : binding.start
+        );
+        // After align, start may equal playhead — try both
+        const trackItem =
+          item ||
+          (await timelineService.getVideoClipTrackItem(
+            binding.trackIndex,
+            binding.clipName,
+            binding.start
+          ));
+        if (!trackItem) {
+          failures.push(`${binding.clipName}: track item not found`);
+          continue;
+        }
+        const map = await componentService.mapClipComponents(trackItem);
+        const t = binding.transform;
+        const label = `MasterMotion: Split cell ${binding.cellIndex + 1}`;
+
+        if (map.params.position) {
+          await componentService.setStaticValue(
+            project,
+            map.params.position,
+            [t.positionX, t.positionY],
+            `${label} position`
+          );
+        } else {
+          failures.push(`${binding.clipName}: Position unavailable`);
+        }
+
+        if (map.params.scale) {
+          await componentService.setStaticValue(project, map.params.scale, t.scale, `${label} scale`);
+        } else {
+          failures.push(`${binding.clipName}: Scale unavailable`);
+        }
+
+        if (map.params.cropLeft) {
+          await componentService.setStaticValue(
+            project,
+            map.params.cropLeft,
+            t.cropLeft,
+            `${label} cropL`
+          );
+        }
+        if (map.params.cropRight) {
+          await componentService.setStaticValue(
+            project,
+            map.params.cropRight,
+            t.cropRight,
+            `${label} cropR`
+          );
+        }
+        if (map.params.cropTop) {
+          await componentService.setStaticValue(
+            project,
+            map.params.cropTop,
+            t.cropTop,
+            `${label} cropT`
+          );
+        }
+        if (map.params.cropBottom) {
+          await componentService.setStaticValue(
+            project,
+            map.params.cropBottom,
+            t.cropBottom,
+            `${label} cropB`
+          );
+        }
+
+        transformed += 1;
+      } catch (cause) {
+        failures.push(`${binding.clipName}: ${String(cause)}`);
+      }
+    }
+
+    timelineService.invalidateCache();
     return {
-      ok: true,
-      message: `Aligned ${count} clip(s) to playhead (geometry preview only — no crop/scale).`,
-      affected: count,
-      details: { layout: plan.config.layout },
+      ok: transformed > 0,
+      message:
+        `Split réel: ${transformed} clip(s) transformé(s)` +
+        (aligned ? `, ${aligned} aligné(s)` : "") +
+        (failures.length ? `. ${failures.length} avertissement(s).` : "."),
+      affected: transformed,
+      details: { failures, aligned },
     };
   },
 
   async verify(plan): Promise<VerifyReport> {
     assertPlanReady(plan, this.label);
-    const analysis = await timelineService.analyzeActive({ bypassCache: true });
-    const video = analysis.clips.filter((c) => c.trackKind === "video").slice(0, plan.cells.length);
-    if (video.length === 0) {
-      return { ok: false, message: "Verify failed: no video clips after apply." };
-    }
-    const target = plan.playheadSeconds;
     const mismatches: string[] = [];
-    // After align, first clips on tracks should be near playhead; allow 1 frame ~0.05s slack
-    for (let i = 0; i < Math.min(video.length, plan.cells.length); i += 1) {
-      if (Math.abs(video[i].start - target) > 0.05) {
-        // Not all tracks may have been moved if plan used clip count from earlier analysis
-        mismatches.push(
-          `Clip “${video[i].name}” start ${video[i].start.toFixed(3)}s ≠ playhead ${target.toFixed(3)}s`
+    const analysis = await timelineService.analyzeActive({ bypassCache: true });
+
+    for (const binding of plan.bindings) {
+      const info = analysis.clips.find((c) => c.id === binding.clipId) ||
+        analysis.clips.find(
+          (c) => c.trackKind === "video" && c.name === binding.clipName && c.trackIndex === binding.trackIndex
         );
+      if (!info) {
+        mismatches.push(`${binding.clipName}: missing after apply`);
+        continue;
+      }
+      const trackItem = await timelineService.getVideoClipTrackItem(
+        info.trackIndex,
+        info.name,
+        info.start
+      );
+      if (!trackItem) {
+        mismatches.push(`${binding.clipName}: no track item`);
+        continue;
+      }
+      const map = await componentService.mapClipComponents(trackItem);
+      const actual: { positionX?: number; positionY?: number; scale?: number; resultWidth?: number } =
+        {};
+      if (map.params.position) {
+        const pt = await componentService.readPoint(map.params.position);
+        if (pt) {
+          actual.positionX = pt[0];
+          actual.positionY = pt[1];
+        }
+      }
+      if (map.params.scale) {
+        const s = await componentService.readNumeric(map.params.scale);
+        if (s !== null) {
+          actual.scale = s;
+          actual.resultWidth = (s / 100) * plan.config.width;
+        }
+      }
+      const check = transformsMatch(binding.transform, actual, 1);
+      if (!check.ok) {
+        mismatches.push(`${binding.clipName}: ${check.mismatches.join("; ")}`);
       }
     }
-    // Soft: if at least one clip matches playhead, treat as partial success for honest reporting
-    const matched = video.filter((c) => Math.abs(c.start - target) <= 0.05).length;
-    if (matched === 0 && mismatches.length > 0) {
-      return {
-        ok: false,
-        message: "Verify: no aligned clip found near playhead.",
-        mismatches,
-      };
-    }
+
     return {
-      ok: true,
-      message: `Verify: ${matched} clip(s) near playhead (±0.05s). Crop/scale not applied.`,
-      mismatches: mismatches.length > 0 ? mismatches : undefined,
+      ok: mismatches.length === 0,
+      message:
+        mismatches.length === 0
+          ? `Verify OK — position/échelle/crop conformes (±1 px) sur ${plan.bindings.length} clip(s).`
+          : `Verify: ${mismatches.length} écart(s)`,
+      mismatches: mismatches.length ? mismatches : undefined,
     };
   },
 };
@@ -177,7 +339,7 @@ async function alignClipsToPlayhead(clipCount: number): Promise<number> {
       if (items.length === 0) {
         continue;
       }
-      const item = items[0];
+      const item = items[0] as VideoClipTrackItem;
       const start = await item.getStartTime();
       moves.push({ item, deltaSeconds: playhead.seconds - start.seconds });
       used += 1;

@@ -379,7 +379,9 @@ export function CaptionsPanel(): ReactElement {
             Copy export
           </button>
         </div>
-        <p className="mm-muted">IA translation disabled (WP12) — no network without consent.</p>
+        <p className="mm-muted">
+          Traduction IA : panneau AI (WP12) — proposition à valider, aucun réseau sans consentement.
+        </p>
       </div>
 
       <PlanList summary={session.summary} />

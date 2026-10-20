@@ -28,8 +28,12 @@ export type CapabilityId =
   | "encoderManager"
   | "exporter"
   | "clipProjectItem"
+  | "projectConverter"
+  | "folderItem"
   | "eventManager"
-  | "sourceMonitor";
+  | "sourceMonitor"
+  | "trackItem.speed.read"
+  | "trackItem.speed.write";
 
 export interface CapabilityEntry {
   id: CapabilityId;
@@ -110,8 +114,12 @@ export class CapabilityService {
         "encoderManager",
         "exporter",
         "clipProjectItem",
+        "projectConverter",
+        "folderItem",
         "eventManager",
         "sourceMonitor",
+        "trackItem.speed.read",
+        "trackItem.speed.write",
       ];
       for (let i = 0; i < unavailableIds.length; i += 1) {
         entries.push({
@@ -276,6 +284,29 @@ export class CapabilityService {
       since: "25.6",
       typed: true,
     });
+    const converter = ppro.ProjectConverter as {
+      exportAsFinalCutProXML?: unknown;
+      exportAsOpenTimelineIO?: unknown;
+      exportAAF?: unknown;
+    } | undefined;
+    const hasXml = probeCallable(converter?.exportAsFinalCutProXML);
+    entries.push({
+      id: "projectConverter",
+      status: hasXml ? "partial" : "unavailable",
+      reason: hasXml
+        ? "FCP XML / OTIO Since 26.2; AAF Since 26.3; EDL unavailable"
+        : "ProjectConverter absent (Premiere 26.2+)",
+      since: "26.2",
+      typed: true,
+    });
+    entries.push({
+      id: "folderItem",
+      status: probeObject(ppro.FolderItem) || probeCallable((ppro.FolderItem as { cast?: unknown } | undefined)?.cast)
+        ? "available"
+        : "unavailable",
+      since: "25.6",
+      typed: true,
+    });
     entries.push({
       id: "eventManager",
       status: probeObject(ppro.EventManager) ? "available" : "unavailable",
@@ -287,6 +318,28 @@ export class CapabilityService {
       status: probeObject(ppro.SourceMonitor) ? "available" : "unavailable",
       since: "25.6",
       typed: true,
+    });
+
+    // WP6 — speed: read typed on VideoClipTrackItem; write not in UXP reference
+    const videoClipProto = ppro.VideoClipTrackItem as Record<string, unknown> | undefined;
+    const hasSetSpeed =
+      probeCallable(videoClipProto?.createSetSpeedAction) ||
+      probeCallable(videoClipProto?.setSpeed);
+    entries.push({
+      id: "trackItem.speed.read",
+      status: "available",
+      reason: "VideoClipTrackItem.getSpeed / isSpeedReversed (Since 25.6)",
+      since: "25.6",
+      typed: true,
+    });
+    entries.push({
+      id: "trackItem.speed.write",
+      status: hasSetSpeed ? "partial" : "unavailable",
+      reason: hasSetSpeed
+        ? "Experimental speed write detected — verify after mutation"
+        : "No createSetSpeedAction/setSpeed in Adobe UXP reference or typings",
+      since: undefined,
+      typed: false,
     });
 
     const report: CapabilitiesReport = {

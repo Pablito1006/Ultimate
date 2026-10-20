@@ -1,3 +1,10 @@
-MasterMotion 0.2.1
+MasterMotion 0.2.15
 Premiere Pro 25.6+
-Double-cliquez Installer.bat
+
+INSTALL
+- Windows (secours non officiel): double-cliquer Installer.bat
+- macOS: voir docs/install/README.md ou ./install-macos.sh
+- Officiel: importer le .ccx via Adobe Developer Distribution / Creative Cloud
+
+AVERTISSEMENT: Installer.bat/ps1 = sideload External, non signe Adobe.
+Voir docs/distribution/signing.md

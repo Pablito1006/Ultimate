@@ -35,7 +35,15 @@ export type PreviewVisualKind =
   | "split-grid"
   | "caption-karaoke"
   | "timeline"
-  | "motion-template";
+  | "motion-template"
+  | "preset-curve"
+  | "speed-curve"
+  | "look-grade"
+  | "volume-curve"
+  | "assembly-ranges"
+  | "delivery-queue"
+  | "macro-flow"
+  | "ai-proposal";
 
 export interface PreviewVisual {
   kind: PreviewVisualKind;

@@ -1,5 +1,7 @@
 # Troubleshooting — chargement UDT
 
+Voir aussi : [getting-started](../getting-started.md) · [install](../install/README.md) · [LIMITS](../LIMITS.md)
+
 ## Le panneau ne s’affiche pas
 
 1. Vérifier **Developer Mode** dans Premiere, puis redémarrer

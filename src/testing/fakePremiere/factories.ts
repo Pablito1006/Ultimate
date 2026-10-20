@@ -8,6 +8,23 @@ import type {
   MakeSequenceOptions,
 } from "./types";
 
+export function defaultMotionParams(): NonNullable<FakeClipData["motionParams"]> {
+  return [
+    { displayName: "Position", value: [0.5, 0.5], keyframes: [], timeVarying: false },
+    { displayName: "Scale", value: 100, keyframes: [], timeVarying: false },
+    { displayName: "Scale Width", value: 100, keyframes: [], timeVarying: false },
+    { displayName: "Scale Height", value: 100, keyframes: [], timeVarying: false },
+    { displayName: "Rotation", value: 0, keyframes: [], timeVarying: false },
+    { displayName: "Anchor Point", value: [0.5, 0.5], keyframes: [], timeVarying: false },
+    { displayName: "Opacity", value: 100, keyframes: [], timeVarying: false },
+    { displayName: "Left", value: 0, keyframes: [], timeVarying: false },
+    { displayName: "Right", value: 0, keyframes: [], timeVarying: false },
+    { displayName: "Top", value: 0, keyframes: [], timeVarying: false },
+    { displayName: "Bottom", value: 0, keyframes: [], timeVarying: false },
+    { displayName: "Blurriness", value: 0, keyframes: [], timeVarying: false },
+  ];
+}
+
 function makeClips(count: number, durationSeconds: number): FakeClipData[] {
   const clips: FakeClipData[] = [];
   for (let i = 0; i < count; i += 1) {
@@ -17,6 +34,7 @@ function makeClips(count: number, durationSeconds: number): FakeClipData[] {
       name: `Clip_${String(i + 1).padStart(3, "0")}`,
       startSeconds: start,
       endSeconds: start + durationSeconds,
+      motionParams: defaultMotionParams(),
     });
   }
   return clips;
@@ -76,5 +94,27 @@ export function makeProject(options: MakeProjectOptions = {}): FakeProjectData {
     sequences,
     activeSequenceGuid: sequences.length > 0 ? sequences[0].guid : null,
     selection: [],
+    rootItems: [
+      {
+        id: nextId("clip"),
+        name: "Offline_Clip.mp4",
+        kind: "clip",
+        mediaPath: "/missing/offline.mp4",
+        offline: true,
+        canProxy: true,
+        canChangeMediaPath: true,
+      },
+      {
+        id: nextId("clip"),
+        name: "Online_Clip.mp4",
+        kind: "clip",
+        mediaPath: "/media/online.mp4",
+        offline: false,
+        canProxy: true,
+        canChangeMediaPath: true,
+      },
+    ],
+    exportJobs: [],
+    interchangeExports: [],
   };
 }

@@ -69,8 +69,20 @@ function createTrackItem(
         },
       };
     },
-    createMoveAction() {
-      return { run() {} };
+    createMoveAction(delta?: { seconds?: number } | number) {
+      return {
+        run() {
+          const seconds =
+            typeof delta === "number"
+              ? delta
+              : typeof delta?.seconds === "number"
+                ? delta.seconds
+                : 0;
+          const duration = clip.endSeconds - clip.startSeconds;
+          clip.startSeconds += seconds;
+          clip.endSeconds = clip.startSeconds + duration;
+        },
+      };
     },
     createSetDisabledAction(disabled: boolean) {
       return {
@@ -110,7 +122,7 @@ function createTrackItem(
       return createGuid(kind === "video" ? "video-media" : "audio-media");
     },
     async getSpeed() {
-      return 1;
+      return clip.speed !== undefined && clip.speed > 0 ? clip.speed : 1;
     },
     async getInPoint() {
       return createTickTime(0);
@@ -125,14 +137,93 @@ function createTrackItem(
       return false;
     },
     async isSpeedReversed() {
-      return 0;
+      return clip.reversed ? 1 : 0;
     },
     async getComponentChain() {
-      const params = clip.mogrtParams || [];
-      const component =
-        params.length === 0
-          ? null
-          : {
+      ensureMotionParams(clip);
+      const components: Array<{
+        displayName: string;
+        matchName: string;
+        params: import("./types").FakeMotionParam[];
+      }> = [];
+
+      if (kind === "audio" && clip.motionParams && clip.motionParams.length > 0) {
+        const volume = clip.motionParams.filter((p) =>
+          ["Level", "Volume", "Gain"].includes(p.displayName)
+        );
+        if (volume.length) {
+          components.push({
+            displayName: "Volume",
+            matchName: "Audio Volume",
+            params: volume,
+          });
+        }
+      }
+
+      if (kind === "video" && clip.motionParams && clip.motionParams.length > 0) {
+        const motion = clip.motionParams.filter((p) =>
+          ["Position", "Scale", "Scale Width", "Scale Height", "Rotation", "Anchor Point"].includes(
+            p.displayName
+          )
+        );
+        const opacity = clip.motionParams.filter((p) => p.displayName === "Opacity");
+        const crop = clip.motionParams.filter((p) =>
+          ["Left", "Right", "Top", "Bottom"].includes(p.displayName)
+        );
+        const blur = clip.motionParams.filter((p) => p.displayName === "Blurriness");
+        const colorNames = [
+          "Temperature",
+          "Tint",
+          "Exposure",
+          "Contrast",
+          "Highlights",
+          "Shadows",
+          "Whites",
+          "Blacks",
+          "Saturation",
+          "Vibrance",
+        ];
+        const color = clip.motionParams.filter((p) => colorNames.includes(p.displayName));
+        if (motion.length) {
+          components.push({
+            displayName: "Motion",
+            matchName: "AE.ADBE Motion",
+            params: motion,
+          });
+        }
+        if (opacity.length) {
+          components.push({
+            displayName: "Opacity",
+            matchName: "AE.ADBE Opacity",
+            params: opacity,
+          });
+        }
+        if (crop.length) {
+          components.push({
+            displayName: "Crop",
+            matchName: "AE.ADBE Crop",
+            params: crop,
+          });
+        }
+        if (blur.length) {
+          components.push({
+            displayName: "Gaussian Blur",
+            matchName: "AE.ADBE Gaussian Blur 2",
+            params: blur,
+          });
+        }
+        if (color.length) {
+          components.push({
+            displayName: "Lumetri Color",
+            matchName: "PR.ADBE Lumetri",
+            params: color,
+          });
+        }
+      }
+
+      const mogrtComponent =
+        clip.mogrtParams && clip.mogrtParams.length > 0
+          ? {
               async getDisplayName() {
                 return "Motion Graphics Template";
               },
@@ -140,19 +231,45 @@ function createTrackItem(
                 return "AE.ADBE Motion Graphics";
               },
               getParamCount() {
-                return params.length;
+                return clip.mogrtParams!.length;
               },
               getParam(paramIndex = 0) {
-                const p = params[paramIndex];
+                const p = clip.mogrtParams![paramIndex];
                 if (!p) {
                   return null;
                 }
                 return createFakeComponentParam(p);
               },
-            };
+            }
+          : null;
+
       return {
-        createAppendComponentAction() {
-          return { run() {} };
+        createAppendComponentAction(component?: { matchName?: string; displayName?: string; _displayName?: string }) {
+          return {
+            run() {
+              const mn = String(component?.matchName ?? "");
+              const dn = String(
+                component?.displayName ?? component?._displayName ?? component?.matchName ?? ""
+              );
+              if (/lumetri/i.test(mn)) {
+                ensureColorParams(clip);
+              }
+              if (/volume|level|gain/i.test(dn) || /volume|level/i.test(mn)) {
+                ensureVolumeParams(clip);
+              }
+              if (/denoise|deesser|noise|reverb/i.test(dn)) {
+                ensureMotionParams(clip);
+                if (!clip.motionParams!.some((p) => p.displayName === "Amount")) {
+                  clip.motionParams!.push({
+                    displayName: "Amount",
+                    value: 50,
+                    keyframes: [],
+                    timeVarying: false,
+                  });
+                }
+              }
+            },
+          };
         },
         createInsertComponentAction() {
           return { run() {} };
@@ -164,15 +281,175 @@ function createTrackItem(
           return { run() {} };
         },
         getComponentCount() {
-          return component ? 1 : 0;
+          return components.length + (mogrtComponent ? 1 : 0);
         },
         getComponentAtIndex(index: number) {
-          return index === 0 ? component : null;
+          if (index < components.length) {
+            const c = components[index];
+            return {
+              async getDisplayName() {
+                return c.displayName;
+              },
+              async getMatchName() {
+                return c.matchName;
+              },
+              getParamCount() {
+                return c.params.length;
+              },
+              getParam(paramIndex = 0) {
+                const p = c.params[paramIndex];
+                if (!p) {
+                  return null;
+                }
+                return createFakeMotionComponentParam(p);
+              },
+            };
+          }
+          if (mogrtComponent && index === components.length) {
+            return mogrtComponent;
+          }
+          return null;
         },
       };
     },
     _fakeClipId: clip.id,
     _fakeClip: clip,
+  };
+}
+
+function ensureMotionParams(clip: FakeClipData): void {
+  if (!clip.motionParams) {
+    // lazy import-free defaults
+    clip.motionParams = [
+      { displayName: "Position", value: [0.5, 0.5], keyframes: [], timeVarying: false },
+      { displayName: "Scale", value: 100, keyframes: [], timeVarying: false },
+      { displayName: "Scale Width", value: 100, keyframes: [], timeVarying: false },
+      { displayName: "Scale Height", value: 100, keyframes: [], timeVarying: false },
+      { displayName: "Rotation", value: 0, keyframes: [], timeVarying: false },
+      { displayName: "Anchor Point", value: [0.5, 0.5], keyframes: [], timeVarying: false },
+      { displayName: "Opacity", value: 100, keyframes: [], timeVarying: false },
+      { displayName: "Left", value: 0, keyframes: [], timeVarying: false },
+      { displayName: "Right", value: 0, keyframes: [], timeVarying: false },
+      { displayName: "Top", value: 0, keyframes: [], timeVarying: false },
+      { displayName: "Bottom", value: 0, keyframes: [], timeVarying: false },
+      { displayName: "Blurriness", value: 0, keyframes: [], timeVarying: false },
+    ];
+  }
+}
+
+/** WP8 — Volume Level param on fake audio clips. */
+function ensureVolumeParams(clip: FakeClipData): void {
+  ensureMotionParams(clip);
+  if (!clip.motionParams!.some((p) => p.displayName === "Level")) {
+    clip.motionParams!.push({
+      displayName: "Level",
+      value: 0,
+      keyframes: [],
+      timeVarying: false,
+    });
+  }
+}
+
+/** WP7 — Lumetri-like Basic Correction params on fake clips. */
+function ensureColorParams(clip: FakeClipData): void {
+  ensureMotionParams(clip);
+  const neutrals: Array<{ name: string; value: number }> = [
+    { name: "Temperature", value: 0 },
+    { name: "Tint", value: 0 },
+    { name: "Exposure", value: 0 },
+    { name: "Contrast", value: 0 },
+    { name: "Highlights", value: 0 },
+    { name: "Shadows", value: 0 },
+    { name: "Whites", value: 0 },
+    { name: "Blacks", value: 0 },
+    { name: "Saturation", value: 100 },
+    { name: "Vibrance", value: 0 },
+  ];
+  for (const n of neutrals) {
+    if (!clip.motionParams!.some((p) => p.displayName === n.name)) {
+      clip.motionParams!.push({
+        displayName: n.name,
+        value: n.value,
+        keyframes: [],
+        timeVarying: false,
+      });
+    }
+  }
+}
+
+function createFakeMotionComponentParam(
+  param: import("./types").FakeMotionParam
+): Record<string, unknown> {
+  return {
+    displayName: param.displayName,
+    async areKeyframesSupported() {
+      return true;
+    },
+    isTimeVarying() {
+      return param.timeVarying || param.keyframes.length > 0;
+    },
+    createKeyframe(value: unknown) {
+      return { _value: value, position: createTickTime(0) };
+    },
+    createSetTimeVaryingAction(tv: boolean) {
+      return {
+        run() {
+          param.timeVarying = tv;
+        },
+      };
+    },
+    createAddKeyframeAction(inKeyFrame: { _value?: unknown; position?: FakeTickTime }) {
+      return {
+        run() {
+          const t = inKeyFrame?.position?.seconds ?? 0;
+          param.keyframes = param.keyframes.filter((k) => Math.abs(k.timeSeconds - t) > 1e-6);
+          param.keyframes.push({ timeSeconds: t, value: inKeyFrame?._value });
+          param.keyframes.sort((a, b) => a.timeSeconds - b.timeSeconds);
+          param.timeVarying = true;
+          param.value = inKeyFrame?._value;
+        },
+      };
+    },
+    createSetValueAction(inKeyFrame: { _value?: unknown }) {
+      return {
+        run() {
+          param.value = inKeyFrame?._value;
+        },
+      };
+    },
+    createRemoveKeyframeRangeAction(inTime: FakeTickTime, outTime: FakeTickTime) {
+      return {
+        run() {
+          const a = inTime?.seconds ?? 0;
+          const b = outTime?.seconds ?? 0;
+          param.keyframes = param.keyframes.filter((k) => k.timeSeconds < a || k.timeSeconds > b);
+        },
+      };
+    },
+    getKeyframeListAsTickTimes() {
+      return param.keyframes.map((k) => createTickTime(k.timeSeconds));
+    },
+    getKeyframePtr(time?: FakeTickTime) {
+      const t = time?.seconds ?? 0;
+      const hit = param.keyframes.find((k) => Math.abs(k.timeSeconds - t) < 1e-4);
+      return hit ? { _value: hit.value, position: createTickTime(hit.timeSeconds) } : null;
+    },
+    async getStartValue() {
+      return { value: param.value };
+    },
+    async getValueAtTime(time: FakeTickTime) {
+      const t = time?.seconds ?? 0;
+      if (param.keyframes.length === 0) {
+        return { value: param.value };
+      }
+      let best = param.keyframes[0];
+      for (const k of param.keyframes) {
+        if (k.timeSeconds <= t) {
+          best = k;
+        }
+      }
+      return { value: best.value };
+    },
   };
 }
 
@@ -240,12 +517,21 @@ function createFakeMogrtText(initial: string): {
   };
 }
 
+function ensureRootItems(project: FakeProjectData): FakeProjectItemData[] {
+  if (!project.rootItems) {
+    project.rootItems = [];
+  }
+  return project.rootItems;
+}
+
 function createProjectItem(
   item: FakeProjectItemData,
   project: FakeProjectData
 ): Record<string, unknown> {
-  return {
+  const self: Record<string, unknown> = {
     name: item.name,
+    guid: createGuid(item.id),
+    type: item.kind === "bin" ? "bin" : "clip",
     createSetNameAction(name: string) {
       return {
         run() {
@@ -257,6 +543,100 @@ function createProjectItem(
           }
         },
       };
+    },
+    createBinAction(name: string, _makeUnique: boolean) {
+      void _makeUnique;
+      return {
+        run() {
+          const root = ensureRootItems(project);
+          root.push({
+            id: nextId("bin"),
+            name,
+            kind: "bin",
+          });
+        },
+      };
+    },
+    async getItems() {
+      if (item.kind === "bin") {
+        return [];
+      }
+      return [];
+    },
+    // ClipProjectItem surface (after cast)
+    async isOffline() {
+      return Boolean(item.offline);
+    },
+    async hasProxy() {
+      return Boolean(item.proxyPath);
+    },
+    async canProxy() {
+      return item.canProxy !== false && item.kind !== "bin";
+    },
+    async canChangeMediaPath() {
+      return item.canChangeMediaPath !== false && item.kind !== "bin";
+    },
+    async getProxyPath() {
+      return item.proxyPath ?? "";
+    },
+    async getMediaFilePath() {
+      return item.mediaPath ?? "";
+    },
+    async isSequence() {
+      return false;
+    },
+    async attachProxy(mediaPath: string, _isHiRes: boolean) {
+      void _isHiRes;
+      if (item.canProxy === false) {
+        return false;
+      }
+      item.proxyPath = mediaPath;
+      return true;
+    },
+    async changeMediaFilePath(newPath: string) {
+      if (item.canChangeMediaPath === false) {
+        return false;
+      }
+      item.mediaPath = newPath;
+      item.offline = false;
+      return true;
+    },
+    createSetOfflineAction() {
+      return {
+        run() {
+          item.offline = true;
+        },
+      };
+    },
+  };
+  self.cast = () => self;
+  return self;
+}
+
+function createRootFolder(project: FakeProjectData): Record<string, unknown> {
+  return {
+    name: "Root",
+    type: "bin",
+    createBinAction(name: string, _makeUnique: boolean) {
+      void _makeUnique;
+      return {
+        run() {
+          ensureRootItems(project).push({
+            id: nextId("bin"),
+            name,
+            kind: "bin",
+          });
+        },
+      };
+    },
+    async getItems() {
+      return ensureRootItems(project).map((item) => createProjectItem(item, project));
+    },
+    createMoveItemAction() {
+      return { run() {} };
+    },
+    createRemoveItemAction() {
+      return { run() {} };
     },
   };
 }
@@ -463,6 +843,65 @@ function createProjectObject(project: FakeProjectData, world: FakeWorld): Record
       world.undoStack.push({ label: undoString ?? "", snapshot: before });
       return true;
     },
+    async getRootItem() {
+      return createRootFolder(project);
+    },
+    async getInsertionBin() {
+      return createRootFolder(project);
+    },
+    async importFiles(filePaths: string[], _suppressUI?: boolean, _targetBin?: unknown) {
+      void _suppressUI;
+      void _targetBin;
+      for (const p of filePaths) {
+        const base = p.replace(/^.*[/\\]/, "") || "imported";
+        ensureRootItems(project).push({
+          id: nextId("clip"),
+          name: base,
+          kind: "clip",
+          mediaPath: p,
+          offline: false,
+          canProxy: true,
+          canChangeMediaPath: true,
+        });
+      }
+      return true;
+    },
+    async createSequence(name: string, _presetPath?: string) {
+      void _presetPath;
+      const seq = {
+        guid: nextId("seq"),
+        name,
+        frameWidth: 1920,
+        frameHeight: 1080,
+        playerPositionSeconds: 0,
+        endTimeSeconds: 0,
+        videoTracks: [{ clips: [] }],
+        audioTracks: [{ clips: [] }],
+        captionTrackCount: 0,
+        markers: [],
+      };
+      project.sequences.push(seq);
+      project.activeSequenceGuid = seq.guid;
+      return createSequenceObject(seq, project);
+    },
+    async createSequenceWithPresetPath(name: string, presetPath: string) {
+      void presetPath;
+      const seq = {
+        guid: nextId("seq"),
+        name,
+        frameWidth: 1920,
+        frameHeight: 1080,
+        playerPositionSeconds: 0,
+        endTimeSeconds: 0,
+        videoTracks: [{ clips: [] }],
+        audioTracks: [{ clips: [] }],
+        captionTrackCount: 0,
+        markers: [],
+      };
+      project.sequences.push(seq);
+      project.activeSequenceGuid = seq.guid;
+      return createSequenceObject(seq, project);
+    },
     async save() {
       return true;
     },
@@ -490,6 +929,29 @@ export function createFakePremiereModule(options: FakeWorldOptions = {}): {
       TRANSITION: 2,
       PREVIEW: 3,
       FEEDBACK: 4,
+    },
+    MediaType: {
+      ANY: 0,
+      DATA: 1,
+      VIDEO: 2,
+      AUDIO: 3,
+    },
+    ExportType: {
+      QUEUE_TO_AME: "QUEUE_TO_AME",
+      QUEUE_TO_APP: "QUEUE_TO_APP",
+      IMMEDIATELY: "IMMEDIATELY",
+    },
+    ProjectEvent: {
+      OPENED: "OPENED",
+      CLOSED: "CLOSED",
+      DIRTY: "DIRTY",
+      ACTIVATED: "ACTIVATED",
+      PROJECT_ITEM_SELECTION_CHANGED: "PROJECT_ITEM_SELECTION_CHANGED",
+    },
+    SequenceEvent: {
+      ACTIVATED: "ACTIVATED",
+      CLOSED: "CLOSED",
+      SELECTION_CHANGED: "SELECTION_CHANGED",
     },
   };
 
@@ -604,10 +1066,69 @@ export function createFakePremiereModule(options: FakeWorldOptions = {}): {
           insertMogrtFromLibrary() {
             return [];
           },
+          createRemoveItemsAction(
+            selection: { getTrackItems?: () => Array<{ _fakeClipId?: string; _fakeClip?: FakeClipData }> },
+            ripple: boolean
+          ) {
+            return {
+              run() {
+                const items =
+                  typeof selection.getTrackItems === "function" ? selection.getTrackItems() : [];
+                const project = world.project;
+                if (!project) {
+                  return;
+                }
+                for (const it of items) {
+                  const clip = it._fakeClip;
+                  if (!clip) {
+                    continue;
+                  }
+                  for (const seq of project.sequences) {
+                    for (const track of [...seq.videoTracks, ...seq.audioTracks]) {
+                      const idx = track.clips.findIndex((c) => c.id === clip.id);
+                      if (idx >= 0) {
+                        const removed = track.clips[idx];
+                        const gap = removed.endSeconds - removed.startSeconds;
+                        track.clips.splice(idx, 1);
+                        if (ripple) {
+                          for (let j = idx; j < track.clips.length; j += 1) {
+                            track.clips[j].startSeconds -= gap;
+                            track.clips[j].endSeconds -= gap;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+            };
+          },
         };
       },
       async getInstalledMogrtPath() {
         return "/fake/mogrt";
+      },
+    },
+    TrackItemSelection: {
+      createEmptySelection(callback: (selection: {
+        addItem: (item: unknown) => boolean;
+        getTrackItems: () => unknown[];
+      }) => void): boolean {
+        const items: unknown[] = [];
+        const selection = {
+          addItem(item: unknown) {
+            items.push(item);
+            return true;
+          },
+          getTrackItems() {
+            return items;
+          },
+          removeItem() {
+            return true;
+          },
+        };
+        callback(selection);
+        return true;
       },
     },
     MogrtText: function FakeMogrtText(this: {
@@ -725,13 +1246,35 @@ export function createFakePremiereModule(options: FakeWorldOptions = {}): {
       },
     },
     VideoFilterFactory: {
-      async createComponent() {
-        return null;
+      async createComponent(matchName: string) {
+        return { matchName, _fakeFilter: true };
+      },
+      async getMatchNames() {
+        return [
+          "AE.ADBE Gaussian Blur 2",
+          "AE.ADBE Directional Blur",
+          "AE.ADBE Mosaic",
+          "PR.ADBE Lumetri",
+          "AE.ADBE Ultra Key",
+          "AE.ADBE Color Key",
+        ];
+      },
+      async getDisplayNames() {
+        return ["Gaussian Blur", "Directional Blur", "Mosaic", "Lumetri Color", "Ultra Key", "Color Key"];
       },
     },
     AudioFilterFactory: {
       async createComponent() {
         return null;
+      },
+      async createComponentByDisplayName(displayName: string) {
+        return { matchName: displayName, displayName, _displayName: displayName, _fakeFilter: true };
+      },
+      async getDisplayNames() {
+        return ["Volume", "Level", "DeNoise", "DeEsser"];
+      },
+      async getMatchNames() {
+        return [];
       },
     },
     Component: {},
@@ -740,6 +1283,9 @@ export function createFakePremiereModule(options: FakeWorldOptions = {}): {
       createWithTimeAndValue() {
         return {};
       },
+      INTERPOLATION_MODE_LINEAR: 0,
+      INTERPOLATION_MODE_BEZIER: 1,
+      INTERPOLATION_MODE_HOLD: 2,
     },
     TransitionFactory: {
       async createTransition() {
@@ -748,23 +1294,161 @@ export function createFakePremiereModule(options: FakeWorldOptions = {}): {
     },
     CaptionTrack: {},
     EncoderManager: {
+      getExportFileExtension(_sequence: unknown, _preset: string) {
+        void _sequence;
+        void _preset;
+        return Promise.resolve("mp4");
+      },
       getManager() {
         return {
-          async exportSequence() {
-            return false;
+          isAMEInstalled: true,
+          async launchEncoder() {
+            return true;
+          },
+          async exportSequence(
+            sequence: { guid?: { toString(): string }; name?: string },
+            exportType: string,
+            outputFile?: string,
+            presetFile?: string,
+            _exportFull?: boolean
+          ) {
+            void _exportFull;
+            const project = world.project;
+            if (!project) {
+              return false;
+            }
+            if (!project.exportJobs) {
+              project.exportJobs = [];
+            }
+            project.exportJobs.push({
+              sequenceGuid: sequence.guid?.toString() ?? sequence.name ?? "",
+              exportType: String(exportType),
+              outputFile,
+              presetFile,
+            });
+            return true;
+          },
+          async encodeProjectItem() {
+            return true;
+          },
+          async startBatchEncode() {
+            return true;
           },
         };
       },
+      EVENT_RENDER_COMPLETE: "renderComplete",
+      EVENT_RENDER_ERROR: "renderError",
+      EVENT_RENDER_PROGRESS: "renderProgress",
+      EVENT_RENDER_QUEUE: "renderQueue",
+      EVENT_RENDER_CANCEL: "renderCancel",
+      EXPORT_IMMEDIATELY: "IMMEDIATELY",
+      EXPORT_QUEUE_TO_AME: "QUEUE_TO_AME",
+      EXPORT_QUEUE_TO_APP: "QUEUE_TO_APP",
     },
-    Exporter: {},
+    Exporter: {
+      async exportSequenceFrame() {
+        return true;
+      },
+    },
+    ProjectConverter: {
+      async exportAsFinalCutProXML(sequence: unknown, outputFilePath: string) {
+        void sequence;
+        if (world.project) {
+          if (!world.project.interchangeExports) {
+            world.project.interchangeExports = [];
+          }
+          world.project.interchangeExports.push({ format: "fcp-xml", path: outputFilePath });
+        }
+        return true;
+      },
+      async exportAsOpenTimelineIO(sequence: unknown, outputFilePath: string) {
+        void sequence;
+        if (world.project) {
+          if (!world.project.interchangeExports) {
+            world.project.interchangeExports = [];
+          }
+          world.project.interchangeExports.push({ format: "otio", path: outputFilePath });
+        }
+        return true;
+      },
+      async exportAAF(sequence: unknown, filePath: string) {
+        void sequence;
+        if (world.project) {
+          if (!world.project.interchangeExports) {
+            world.project.interchangeExports = [];
+          }
+          world.project.interchangeExports.push({ format: "aaf", path: filePath });
+        }
+        return true;
+      },
+    },
+    FolderItem: {
+      cast(item: unknown) {
+        return item;
+      },
+    },
     ClipProjectItem: {
       cast(item: unknown) {
         return item;
       },
     },
+    PRProduction: {
+      getActiveProduction() {
+        return null;
+      },
+    },
     EventManager: {
-      addEventListener() {},
-      removeEventListener() {},
+      _listeners: [] as Array<{
+        target: unknown;
+        eventName: unknown;
+        handler: (event?: object) => void;
+      }>,
+      addEventListener(
+        target: unknown,
+        eventName: unknown,
+        eventHandler: (event?: object) => void
+      ) {
+        (this as { _listeners: Array<{ target: unknown; eventName: unknown; handler: (e?: object) => void }> })._listeners.push(
+          { target, eventName, handler: eventHandler }
+        );
+      },
+      removeEventListener(
+        target: unknown,
+        eventName: unknown,
+        eventHandler: (event?: object) => void
+      ) {
+        const self = this as {
+          _listeners: Array<{ target: unknown; eventName: unknown; handler: (e?: object) => void }>;
+        };
+        self._listeners = self._listeners.filter(
+          (l) =>
+            !(l.target === target && l.eventName === eventName && l.handler === eventHandler)
+        );
+      },
+      addGlobalEventListener(eventName: unknown, eventHandler: (event?: object) => void) {
+        (this as { _listeners: Array<{ target: unknown; eventName: unknown; handler: (e?: object) => void }> })._listeners.push(
+          { target: null, eventName, handler: eventHandler }
+        );
+      },
+      removeGlobalEventListener(eventName: unknown, eventHandler: (event?: object) => void) {
+        const self = this as {
+          _listeners: Array<{ target: unknown; eventName: unknown; handler: (e?: object) => void }>;
+        };
+        self._listeners = self._listeners.filter(
+          (l) => !(l.target === null && l.eventName === eventName && l.handler === eventHandler)
+        );
+      },
+      /** Test helper: emit to matching listeners. */
+      __emit(eventName: unknown, event?: object) {
+        const self = this as {
+          _listeners: Array<{ target: unknown; eventName: unknown; handler: (e?: object) => void }>;
+        };
+        for (const l of self._listeners) {
+          if (l.eventName === eventName || String(l.eventName) === String(eventName)) {
+            l.handler(event);
+          }
+        }
+      },
     },
     SourceMonitor: {
       async openFilePath() {

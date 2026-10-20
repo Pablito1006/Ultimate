@@ -1,4 +1,5 @@
 import type { ReactElement } from "react";
+import { useI18n } from "../../i18n";
 import type { HostContextSnapshot } from "../../premiere/application/ApplicationService";
 import { StatusDot } from "../components/StatusDot";
 
@@ -15,6 +16,7 @@ export function DashboardPanel({
   context,
   onRefresh,
 }: DashboardPanelProps): ReactElement {
+  const { t } = useI18n();
   const compatibility = context?.compatibility;
   const hostTone =
     !compatibility
@@ -25,10 +27,8 @@ export function DashboardPanel({
 
   return (
     <section>
-      <h1 className="mm-panel-title">Dashboard</h1>
-      <p className="mm-panel-subtitle">
-        Host connection, active project and sequence status.
-      </p>
+      <h1 className="mm-panel-title">{t("dashboard.title")}</h1>
+      <p className="mm-panel-subtitle">{t("dashboard.subtitle")}</p>
 
       {error ? <div className="mm-banner mm-banner--error">{error}</div> : null}
 
@@ -41,7 +41,7 @@ export function DashboardPanel({
       ) : null}
 
       <div className="mm-card">
-        <h2 className="mm-card__title">Host</h2>
+        <h2 className="mm-card__title">{t("dashboard.host")}</h2>
         <div className="mm-row">
           <span className="mm-row__label">Status</span>
           <span className="mm-row__value">
@@ -62,7 +62,7 @@ export function DashboardPanel({
       </div>
 
       <div className="mm-card">
-        <h2 className="mm-card__title">Project</h2>
+        <h2 className="mm-card__title">{t("dashboard.project")}</h2>
         {context?.project ? (
           <>
             <div className="mm-row">
@@ -80,7 +80,7 @@ export function DashboardPanel({
       </div>
 
       <div className="mm-card">
-        <h2 className="mm-card__title">Sequence</h2>
+        <h2 className="mm-card__title">{t("dashboard.sequence")}</h2>
         {context?.sequence ? (
           <>
             <div className="mm-row">
@@ -153,9 +153,14 @@ export function DashboardPanel({
         </div>
       ) : null}
 
+      <div className="mm-card">
+        <h2 className="mm-card__title">{t("dashboard.limitsTitle")}</h2>
+        <p className="mm-muted">{t("dashboard.limitsBody")}</p>
+      </div>
+
       <div className="mm-actions">
         <button type="button" className="mm-btn mm-btn--primary" onClick={onRefresh} disabled={loading}>
-          {loading ? "Refreshing…" : "Refresh"}
+          {loading ? t("common.loading") : t("dashboard.refresh")}
         </button>
       </div>
     </section>

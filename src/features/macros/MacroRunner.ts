@@ -6,9 +6,14 @@ import { clipRenameService } from "../../premiere/clips/ClipRenameService";
 import { renameItems } from "../batch-renaming/renameEngine";
 import { projectService } from "../../premiere/project/ProjectService";
 import { runMacro } from "./macroEngine";
-import type { Macro, MacroAction, MacroRunResult } from "./macroTypes";
+import { MACRO_LIBRARY } from "./macroLibrary";
+import type { Macro, MacroAction, MacroRunOptions, MacroRunResult, MacroValue } from "./macroTypes";
 
-async function handleAction(action: MacroAction): Promise<{ ok: boolean; message: string }> {
+async function handleAction(
+  action: MacroAction,
+  _ctx: { variables: Record<string, MacroValue> }
+): Promise<{ ok: boolean; message: string }> {
+  void _ctx;
   switch (action.type) {
     case "refreshContext":
     case "analyzeTimeline": {
@@ -47,49 +52,28 @@ async function handleAction(action: MacroAction): Promise<{ ok: boolean; message
       await soundDesignService.setAudioTrackMute(trackIndex, false);
       return { ok: true, message: `Unmuted audio track ${trackIndex}.` };
     }
+    case "setVariable":
+    case "logMessage":
+    case "noop":
+      // Handled in macroEngine before handler — safety net
+      return { ok: true, message: action.type };
     default:
       return { ok: false, message: `Unsupported action type.` };
   }
 }
 
 export class MacroRunner {
-  async run(macro: Macro): Promise<MacroRunResult> {
-    Logger.info("Running macro", { id: macro.id, name: macro.name });
-    return runMacro(macro, handleAction);
+  async run(macro: Macro, options?: MacroRunOptions): Promise<MacroRunResult> {
+    Logger.info("Running macro", {
+      id: macro.id,
+      name: macro.name,
+      schemaVersion: macro.schemaVersion ?? 1,
+    });
+    return runMacro(macro, handleAction, options);
   }
 }
 
 export const macroRunner = new MacroRunner();
 
-export const BUILTIN_MACROS: Macro[] = [
-  {
-    id: "macro_analyze",
-    name: "Analyze Timeline",
-    description: "Refresh timeline analysis summary.",
-    actions: [{ id: "a1", type: "analyzeTimeline" }],
-  },
-  {
-    id: "macro_marker",
-    name: "Mark Playhead",
-    description: "Add a Comment marker at the playhead.",
-    actions: [
-      {
-        id: "a1",
-        type: "addMarkerAtPlayhead",
-        params: { name: "MM Cue", comments: "Macro marker" },
-      },
-    ],
-  },
-  {
-    id: "macro_prefix",
-    name: "Prefix Selected Clips",
-    description: "Prefix selected project panel items with MM_.",
-    actions: [{ id: "a1", type: "renameSelectedPrefix", params: { prefix: "MM_" } }],
-  },
-  {
-    id: "macro_mute_a1",
-    name: "Mute A1",
-    description: "Mute audio track index 0.",
-    actions: [{ id: "a1", type: "muteAudioTrack", params: { trackIndex: 0 } }],
-  },
-];
+/** Builtin + recipe library (WP11). */
+export const BUILTIN_MACROS: Macro[] = MACRO_LIBRARY;

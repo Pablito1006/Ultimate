@@ -1,5 +1,8 @@
 import { Logger } from "../../core/logging/Logger";
+import type { AiConsentState } from "../../features/ai/aiTypes";
+import { DEFAULT_AI_CONSENT } from "../../features/ai/aiTypes";
 import type { CaptionStyleId } from "../../features/subtitles/captionStyles";
+import type { MacroTriggerBinding } from "../../features/macros/macroTriggers";
 import type { Macro } from "../../features/macros/macroTypes";
 import { BUILTIN_MACROS } from "../../features/macros/MacroRunner";
 import { getUxpModule, isUxpRuntimeAvailable } from "../../premiere/adapters/uxpModule";
@@ -15,6 +18,14 @@ export interface PluginSettings {
   recentTemplateIds: string[];
   /** Optional user-chosen local templates folder (absolute path). */
   templateLibraryPath: string;
+  /** commandId → chord (e.g. "mod+k"). */
+  shortcuts: Record<string, string>;
+  /** Opt-in EventManager → macro bindings (disabled by default). */
+  macroTriggers: MacroTriggerBinding[];
+  /**
+   * AI consent flags only — API key lives in AiKeyStore (never here).
+   */
+  ai: AiConsentState;
 }
 
 const STORAGE_KEY = "mastermotion.settings.v1";
@@ -29,6 +40,12 @@ const DEFAULT_SETTINGS: PluginSettings = {
   favoriteTemplateIds: [],
   recentTemplateIds: [],
   templateLibraryPath: "",
+  shortcuts: {
+    "cmd.palette": "mod+k",
+    "cmd.macros.runSelected": "mod+shift+m",
+  },
+  macroTriggers: [],
+  ai: { ...DEFAULT_AI_CONSENT },
 };
 
 function readLocalStorage(): string | null {
@@ -65,6 +82,9 @@ export class SettingsService {
       favoriteTemplateIds: DEFAULT_SETTINGS.favoriteTemplateIds.slice(),
       recentTemplateIds: DEFAULT_SETTINGS.recentTemplateIds.slice(),
       templateLibraryPath: DEFAULT_SETTINGS.templateLibraryPath,
+      shortcuts: { ...DEFAULT_SETTINGS.shortcuts },
+      macroTriggers: DEFAULT_SETTINGS.macroTriggers.slice(),
+      ai: { ...DEFAULT_AI_CONSENT },
     };
   }
 
@@ -104,6 +124,16 @@ export class SettingsService {
         recentTemplateIds: Array.isArray(parsed.recentTemplateIds) ? parsed.recentTemplateIds : [],
         templateLibraryPath:
           typeof parsed.templateLibraryPath === "string" ? parsed.templateLibraryPath : "",
+        shortcuts:
+          parsed.shortcuts && typeof parsed.shortcuts === "object"
+            ? { ...DEFAULT_SETTINGS.shortcuts, ...parsed.shortcuts }
+            : { ...DEFAULT_SETTINGS.shortcuts },
+        macroTriggers: Array.isArray(parsed.macroTriggers) ? parsed.macroTriggers : [],
+        ai: {
+          ...DEFAULT_AI_CONSENT,
+          ...(parsed.ai && typeof parsed.ai === "object" ? parsed.ai : {}),
+          // Never accept a key from settings JSON
+        },
       };
       return this.cache;
     } catch (cause) {

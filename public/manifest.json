@@ -3,7 +3,7 @@
   "id": "com.mastermotion.toolkit",
   "name": "MasterMotion & AI Toolkit Pro",
   "shortname": "MasterMotion",
-  "version": "0.2.5",
+  "version": "0.2.15",
   "main": "index.html",
   "host": {
     "app": "premierepro",
@@ -11,7 +11,12 @@
   },
   "requiredPermissions": {
     "localFileSystem": "request",
-    "clipboard": "readAndWrite"
+    "clipboard": "readAndWrite",
+    "network": {
+      "domains": [
+        "https://api.openai.com"
+      ]
+    }
   },
   "entrypoints": [
     {

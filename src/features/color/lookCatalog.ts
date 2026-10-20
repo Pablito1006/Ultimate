@@ -1,0 +1,212 @@
+import type { LookDefinition } from "./lookTypes";
+
+/**
+ * ≥20 built-in looks as Lumetri-style parameter sets.
+ * LUT files under assets/luts/ are references for manual import only.
+ */
+export const LOOK_CATALOG: LookDefinition[] = [
+  {
+    id: "neutral-reset",
+    name: "Neutre (reset)",
+    category: "neutral",
+    description: "Remet Basic Correction aux neutres",
+    params: {},
+    preview: { warm: 0, cool: 0, contrast: 0, sat: 0 },
+  },
+  {
+    id: "warm-sun",
+    name: "Soleil chaud",
+    category: "warm",
+    description: "Température + exposition légère",
+    params: { temperature: 28, tint: 4, exposure: 0.15, saturation: 110, vibrance: 12 },
+    preview: { warm: 0.7, cool: 0, contrast: 0.1, sat: 0.2 },
+  },
+  {
+    id: "golden-hour",
+    name: "Golden hour",
+    category: "warm",
+    description: "Orange doux, ombres relevées",
+    params: { temperature: 35, tint: 8, shadows: 15, highlights: -8, saturation: 108, vibrance: 18 },
+    preview: { warm: 0.85, cool: 0, contrast: 0.15, sat: 0.25 },
+  },
+  {
+    id: "amber-glow",
+    name: "Ambre",
+    category: "warm",
+    description: "Teinte ambrée cinéma",
+    params: { temperature: 42, tint: 10, contrast: 8, saturation: 105 },
+    preview: { warm: 0.9, cool: 0, contrast: 0.2, sat: 0.15 },
+  },
+  {
+    id: "cool-steel",
+    name: "Acier froid",
+    category: "cool",
+    description: "Bleu-gris corporate",
+    params: { temperature: -30, tint: -4, contrast: 12, saturation: 90, vibrance: -5 },
+    preview: { warm: 0, cool: 0.75, contrast: 0.25, sat: -0.15 },
+  },
+  {
+    id: "arctic",
+    name: "Arctique",
+    category: "cool",
+    description: "Froid poussé, hautes lumières dures",
+    params: { temperature: -40, tint: -6, highlights: 10, whites: 8, saturation: 85 },
+    preview: { warm: 0, cool: 0.9, contrast: 0.2, sat: -0.25 },
+  },
+  {
+    id: "teal-mood",
+    name: "Teal mood",
+    category: "cool",
+    description: "Teinte cyan légère",
+    params: { temperature: -18, tint: -12, shadows: 8, vibrance: 10, saturation: 95 },
+    preview: { warm: 0.1, cool: 0.7, contrast: 0.1, sat: 0.05 },
+  },
+  {
+    id: "cine-teal-orange",
+    name: "Teal & Orange",
+    category: "cinematic",
+    description: "Look cinéma classique (approx params)",
+    params: { temperature: 12, tint: -8, contrast: 18, shadows: -10, highlights: -5, saturation: 112, vibrance: 15 },
+    preview: { warm: 0.55, cool: 0.45, contrast: 0.4, sat: 0.3 },
+  },
+  {
+    id: "cine-noir",
+    name: "Noir cinéma",
+    category: "cinematic",
+    description: "Contraste fort, désat",
+    params: { contrast: 28, blacks: -18, whites: 8, saturation: 70, vibrance: -10, shadows: -12 },
+    preview: { warm: 0.1, cool: 0.15, contrast: 0.7, sat: -0.4 },
+  },
+  {
+    id: "cine-soft",
+    name: "Soft film",
+    category: "cinematic",
+    description: "Contraste doux, fade léger via blacks",
+    params: { contrast: -8, blacks: 12, whites: -6, saturation: 95, exposure: 0.05 },
+    preview: { warm: 0.2, cool: 0.1, contrast: -0.2, sat: -0.1 },
+  },
+  {
+    id: "bleach-bypass",
+    name: "Bleach bypass",
+    category: "cinematic",
+    description: "Désat + contraste",
+    params: { contrast: 22, saturation: 55, vibrance: -20, highlights: 5, blacks: -10 },
+    preview: { warm: 0.05, cool: 0.1, contrast: 0.55, sat: -0.55 },
+  },
+  {
+    id: "vintage-fade",
+    name: "Vintage fade",
+    category: "vintage",
+    description: "Noirs relevés, sat basse",
+    params: { blacks: 18, whites: -8, contrast: -5, saturation: 80, temperature: 10, tint: 6 },
+    lutFile: "mm-vintage-fade.cube",
+    preview: { warm: 0.4, cool: 0.1, contrast: -0.15, sat: -0.3 },
+  },
+  {
+    id: "sepia-soft",
+    name: "Sépia doux",
+    category: "vintage",
+    description: "Chaleur + désat",
+    params: { temperature: 45, tint: 15, saturation: 60, vibrance: -15, contrast: 5 },
+    preview: { warm: 0.95, cool: 0, contrast: 0.15, sat: -0.35 },
+  },
+  {
+    id: "70s-film",
+    name: "Film 70s",
+    category: "vintage",
+    description: "Vert-jaune nostalgique",
+    params: { temperature: 20, tint: 18, contrast: 10, saturation: 90, shadows: 8 },
+    preview: { warm: 0.6, cool: 0.05, contrast: 0.25, sat: -0.1 },
+  },
+  {
+    id: "punch-contrast",
+    name: "Punch",
+    category: "high-contrast",
+    description: "Contraste et vibrance pour sizzle",
+    params: { contrast: 25, vibrance: 25, saturation: 115, blacks: -8, whites: 6 },
+    preview: { warm: 0.15, cool: 0.1, contrast: 0.6, sat: 0.35 },
+  },
+  {
+    id: "crisp-white",
+    name: "Crisp white",
+    category: "high-contrast",
+    description: "Blancs poussés, clean",
+    params: { whites: 15, highlights: 8, contrast: 14, exposure: 0.1, saturation: 105 },
+    preview: { warm: 0.05, cool: 0.05, contrast: 0.35, sat: 0.1 },
+  },
+  {
+    id: "shadow-lift",
+    name: "Shadow lift",
+    category: "high-contrast",
+    description: "Ouvre les ombres",
+    params: { shadows: 25, blacks: 8, contrast: -4, exposure: 0.08 },
+    preview: { warm: 0.1, cool: 0.05, contrast: -0.1, sat: 0 },
+  },
+  {
+    id: "muted-editorial",
+    name: "Éditorial muted",
+    category: "desat",
+    description: "Désaturation élégante",
+    params: { saturation: 65, vibrance: -8, contrast: 8, temperature: -5 },
+    preview: { warm: 0, cool: 0.2, contrast: 0.2, sat: -0.45 },
+  },
+  {
+    id: "bw-soft",
+    name: "N&B soft",
+    category: "desat",
+    description: "Quasi monochrome doux",
+    params: { saturation: 0, vibrance: -50, contrast: 10, blacks: 5 },
+    preview: { warm: 0, cool: 0, contrast: 0.25, sat: -1 },
+  },
+  {
+    id: "social-pop",
+    name: "Social pop",
+    category: "social",
+    description: "Vibrance pour Reels / Shorts",
+    params: { vibrance: 30, saturation: 120, contrast: 12, exposure: 0.12, temperature: 8 },
+    preview: { warm: 0.3, cool: 0.05, contrast: 0.3, sat: 0.45 },
+  },
+  {
+    id: "skin-friendly",
+    name: "Peau douce",
+    category: "social",
+    description: "Chaleur légère, ombres ouvertes",
+    params: { temperature: 12, tint: 4, shadows: 12, contrast: -4, vibrance: 8, saturation: 102 },
+    preview: { warm: 0.4, cool: 0, contrast: -0.05, sat: 0.1 },
+  },
+  {
+    id: "night-city",
+    name: "Night city",
+    category: "cool",
+    description: "Nuit urbaine bleutée",
+    params: { temperature: -25, contrast: 16, shadows: -8, highlights: -12, vibrance: 12, saturation: 108 },
+    preview: { warm: 0.05, cool: 0.8, contrast: 0.35, sat: 0.2 },
+  },
+  {
+    id: "lut-ref-warm",
+    name: "LUT ref Warm (manuel)",
+    category: "lut-ref",
+    description: "Référence .cube — appliquer params équivalents ; import LUT manuel",
+    params: { temperature: 30, contrast: 10, saturation: 108, vibrance: 10 },
+    lutFile: "mm-warm-ref.cube",
+    preview: { warm: 0.7, cool: 0, contrast: 0.2, sat: 0.2 },
+  },
+  {
+    id: "lut-ref-cool",
+    name: "LUT ref Cool (manuel)",
+    category: "lut-ref",
+    description: "Référence .cube — params équivalents ; GUID LUT unavailable",
+    params: { temperature: -28, contrast: 12, saturation: 92 },
+    lutFile: "mm-cool-ref.cube",
+    preview: { warm: 0, cool: 0.75, contrast: 0.25, sat: -0.1 },
+  },
+];
+
+export function getLookById(id: string): LookDefinition | undefined {
+  return LOOK_CATALOG.find((l) => l.id === id);
+}
+
+export function listLookCategories(): string[] {
+  const set = new Set(LOOK_CATALOG.map((l) => l.category));
+  return Array.from(set);
+}

@@ -27,15 +27,33 @@ export interface FakeMogrtParam {
   kind: "text" | "color" | "number" | "boolean" | "other";
 }
 
+export interface FakeKeyframe {
+  timeSeconds: number;
+  value: unknown;
+}
+
+export interface FakeMotionParam {
+  displayName: string;
+  value: unknown;
+  keyframes: FakeKeyframe[];
+  timeVarying: boolean;
+}
+
 export interface FakeClipData {
   id: string;
   name: string;
   startSeconds: number;
   endSeconds: number;
   disabled?: boolean;
+  /** Playback ratio (1 = 100 %). WP6 getSpeed. */
+  speed?: number;
+  /** When true, isSpeedReversed returns 1. */
+  reversed?: boolean;
   /** When set, clip was inserted from a .mogrt path (fake). */
   mogrtPath?: string;
   mogrtParams?: FakeMogrtParam[];
+  /** Built-in Motion / Opacity params for WP4 presets. */
+  motionParams?: FakeMotionParam[];
 }
 
 export interface FakeTrackData {
@@ -58,6 +76,20 @@ export interface FakeSequenceData {
 export interface FakeProjectItemData {
   id: string;
   name: string;
+  /** bin | clip */
+  kind?: "bin" | "clip";
+  mediaPath?: string;
+  offline?: boolean;
+  proxyPath?: string | null;
+  canProxy?: boolean;
+  canChangeMediaPath?: boolean;
+}
+
+export interface FakeExportJob {
+  sequenceGuid: string;
+  exportType: string;
+  outputFile?: string;
+  presetFile?: string;
 }
 
 export interface FakeProjectData {
@@ -67,6 +99,12 @@ export interface FakeProjectData {
   sequences: FakeSequenceData[];
   activeSequenceGuid: string | null;
   selection: FakeProjectItemData[];
+  /** Root project items (bins + clips). */
+  rootItems?: FakeProjectItemData[];
+  /** Recorded EncoderManager jobs. */
+  exportJobs?: FakeExportJob[];
+  /** Interchange exports for verify. */
+  interchangeExports?: Array<{ format: string; path: string }>;
 }
 
 export interface FakeWorldOptions {

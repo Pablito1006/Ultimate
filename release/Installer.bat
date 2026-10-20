@@ -6,6 +6,7 @@ cd /d "%~dp0"
 
 echo.
 echo  Lancement de l'installeur MasterMotion...
+echo  AVERTISSEMENT: sideload External = NON OFFICIEL / non signe Adobe.
 echo.
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Installer.ps1"

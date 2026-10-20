@@ -560,3 +560,6 @@ button:disabled {
   border-radius: 2px;
   color: var(--mm-text);
 }
+
+/* WP11 Command palette */
+.mm-palette-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding-top:12vh}.mm-palette{width:min(420px,92vw);background:var(--mm-surface,#1a1a1e);border:1px solid var(--mm-border,#333);border-radius:6px;overflow:hidden}.mm-palette__input{width:100%;box-sizing:border-box;padding:12px 14px;border:none;border-bottom:1px solid var(--mm-border,#333);background:transparent;color:var(--mm-text,#eee);font-size:14px}.mm-palette__list{list-style:none;margin:0;padding:4px 0;max-height:280px;overflow:auto}.mm-palette__item{width:100%;display:flex;justify-content:space-between;gap:8px;padding:8px 14px;border:none;background:transparent;color:var(--mm-text,#eee);text-align:left;cursor:pointer;font-size:12px}.mm-palette__item--active,.mm-palette__item:hover{background:#2a3a4a}.mm-palette__hint{padding:6px 14px 10px;margin:0;font-size:10px}

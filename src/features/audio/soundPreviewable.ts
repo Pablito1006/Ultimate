@@ -7,6 +7,7 @@ import {
   type SoundSuggestion,
   type TimelineEvent,
 } from "./soundDesignEngine";
+import { getSfxCatalog } from "./sfxCatalog";
 import { soundDesignService } from "./SoundDesignService";
 
 export interface SoundPlanInput {
@@ -38,7 +39,7 @@ export function planSoundPure(
   }
   return {
     events,
-    suggestions: suggestSoundEffects(events),
+    suggestions: suggestSoundEffects(events, getSfxCatalog()),
   };
 }
 
@@ -82,12 +83,12 @@ export const soundPreviewable: PreviewablePlan<SoundPlanInput, SoundPlan> = {
         suggestions: plan.suggestions.length,
       },
       warnings: [
-        "Suggestions never insert media. Apply places approval markers only.",
-        "Loudness/ducking not claimed without Premiere API support.",
+        "Suggestions never insert media. Apply places approval markers only (SFX: markers).",
+        "Catalogue local ≥100 — pas d’insertion média automatique.",
       ],
       estimatedMs: Math.max(40, plan.suggestions.length * 25),
-      levels: ["A"],
-      levelCNote: "Level C unavailable in WP1.",
+      levels: ["A", "B"],
+      levelCNote: "Level C unavailable.",
       changes: plan.suggestions.map((s) => ({
         id: `${s.eventId}_${s.sfxId}`,
         label: `${s.time.toFixed(2)}s`,

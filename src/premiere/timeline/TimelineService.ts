@@ -1,4 +1,4 @@
-import type { Project, Sequence, VideoClipTrackItem } from "@adobe/premierepro";
+import type { AudioClipTrackItem, Project, Sequence, VideoClipTrackItem } from "@adobe/premierepro";
 import { PremiereError } from "../../core/errors/AppError";
 import { Logger } from "../../core/logging/Logger";
 import { getPremiereModule } from "../adapters/premiereModule";
@@ -15,6 +15,12 @@ export interface TimelineClipInfo {
   start: number;
   end: number;
   duration: number;
+  /** Playback ratio from getSpeed (1 = 100 %). Default 1 if unread. */
+  speed: number;
+  /** From isSpeedReversed (Adobe returns number 0/1). */
+  reversed: boolean;
+  /** From isDisabled — used by WP9 cleanup. */
+  disabled: boolean;
 }
 
 export interface TimelineMarkerInfo {
@@ -53,6 +59,9 @@ type ClipTimes = {
   start: number;
   end: number;
   duration: number;
+  speed: number;
+  reversed: boolean;
+  disabled: boolean;
 };
 
 export class TimelineService {
@@ -131,6 +140,9 @@ export class TimelineService {
             start: t.start,
             end: t.end,
             duration: t.duration,
+            speed: t.speed,
+            reversed: t.reversed,
+            disabled: t.disabled,
           });
         }
       }
@@ -155,6 +167,9 @@ export class TimelineService {
             start: t.start,
             end: t.end,
             duration: t.duration,
+            speed: t.speed,
+            reversed: t.reversed,
+            disabled: t.disabled,
           });
         }
       }
@@ -209,21 +224,32 @@ export class TimelineService {
       getStartTime: () => Promise<{ seconds: number }>;
       getEndTime: () => Promise<{ seconds: number }>;
       getDuration: () => Promise<{ seconds: number }>;
+      getSpeed?: () => Promise<number>;
+      isSpeedReversed?: () => Promise<number | boolean>;
+      isDisabled?: () => Promise<boolean>;
     }>
   ): Promise<ClipTimes[]> {
     return Promise.all(
       items.map(async (item) => {
-        const [name, start, end, duration] = await Promise.all([
+        const [name, start, end, duration, speed, reversedRaw, disabled] = await Promise.all([
           item.getName(),
           item.getStartTime(),
           item.getEndTime(),
           item.getDuration(),
+          item.getSpeed ? item.getSpeed() : Promise.resolve(1),
+          item.isSpeedReversed ? item.isSpeedReversed() : Promise.resolve(0),
+          item.isDisabled ? item.isDisabled() : Promise.resolve(false),
         ]);
+        const reversed =
+          typeof reversedRaw === "boolean" ? reversedRaw : Number(reversedRaw) !== 0;
         return {
           name,
           start: start.seconds,
           end: end.seconds,
           duration: duration.seconds,
+          speed: typeof speed === "number" && speed > 0 ? speed : 1,
+          reversed,
+          disabled: Boolean(disabled),
         };
       })
     );
@@ -234,6 +260,67 @@ export class TimelineService {
       timelineCache.invalidateSequence(sequenceGuid);
     } else {
       timelineCache.invalidateAll();
+    }
+  }
+
+  /**
+   * Resolve a live video track item by track index + name + start (seconds).
+   * Used by WP4 presets after planning from TimelineAnalysis ids.
+   */
+  async getVideoClipTrackItem(
+    trackIndex: number,
+    name: string,
+    startSeconds: number
+  ): Promise<(VideoClipTrackItem & { name?: string }) | null> {
+    const project = await projectService.requireActiveProject();
+    const sequence = await sequenceService.requireActiveSequence(project);
+    const ppro = getPremiereModule();
+    try {
+      const track = await sequence.getVideoTrack(trackIndex);
+      const items = track.getTrackItems(
+        ppro.Constants.TrackItemType.CLIP,
+        false
+      ) as VideoClipTrackItem[];
+      for (const item of items) {
+        const [itemName, start] = await Promise.all([item.getName(), item.getStartTime()]);
+        if (itemName === name && Math.abs(start.seconds - startSeconds) < 0.02) {
+          return item;
+        }
+      }
+      return null;
+    } catch (cause) {
+      Logger.error("getVideoClipTrackItem failed", { cause: String(cause) });
+      return null;
+    }
+  }
+
+  /**
+   * Resolve a live audio track item by track index + name + start (seconds).
+   */
+  async getAudioClipTrackItem(
+    trackIndex: number,
+    name: string,
+    startSeconds: number
+  ): Promise<(AudioClipTrackItem & { name?: string }) | null> {
+    const project = await projectService.requireActiveProject();
+    const sequence = await sequenceService.requireActiveSequence(project);
+    const ppro = getPremiereModule();
+    try {
+      const track = await sequence.getAudioTrack(trackIndex);
+      const items = track.getTrackItems(
+        ppro.Constants.TrackItemType.CLIP,
+        false
+      ) as AudioClipTrackItem[];
+      for (const item of items) {
+        const [itemName, start] = await Promise.all([item.getName(), item.getStartTime()]);
+        if (itemName === name && Math.abs(start.seconds - startSeconds) < 0.02) {
+          return item;
+        }
+      }
+      return null;
+    } catch (cause) {
+      Logger.error("getAudioClipTrackItem failed", { cause: String(cause) });
+      return null;
     }
   }
 

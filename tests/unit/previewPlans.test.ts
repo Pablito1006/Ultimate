@@ -32,10 +32,21 @@ describe("preview plan() pure helpers", () => {
   });
 
   it("split plan geometry matches layout engine", () => {
-    const plan = planSplitPure("2x2", { width: 1920, height: 1080 }, ["A", "B", "C", "D"]);
+    const plan = planSplitPure(
+      "2x2",
+      { width: 1920, height: 1080 },
+      [
+        { id: "1", name: "A", trackIndex: 0, start: 0 },
+        { id: "2", name: "B", trackIndex: 1, start: 0 },
+        { id: "3", name: "C", trackIndex: 2, start: 0 },
+        { id: "4", name: "D", trackIndex: 3, start: 0 },
+      ]
+    );
     expect(plan.cells).toHaveLength(4);
+    expect(plan.bindings).toHaveLength(4);
     expect(plan.cells[0].x).toBeGreaterThanOrEqual(0);
     expect(plan.cells[3].width).toBeGreaterThan(0);
+    expect(plan.bindings[0].transform.scale).toBeGreaterThan(0);
   });
 
   it("captions plan builds segments offline", async () => {

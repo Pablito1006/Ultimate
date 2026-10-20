@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactElement } from "react";
 import { toUserMessage } from "../../core/errors/AppError";
 import { Logger } from "../../core/logging/Logger";
 import { CAPTION_STYLE_PRESETS, type CaptionStyleId } from "../../features/subtitles/captionStyles";
+import { useI18n } from "../../i18n";
 import {
   capabilityService,
   type CapabilitiesReport,
@@ -29,6 +30,7 @@ function statusLabel(status: CapabilityStatus): string {
 }
 
 export function SettingsPanel(): ReactElement {
+  const { t, setLocale } = useI18n();
   const [settings, setSettings] = useState<PluginSettings | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +50,7 @@ export function SettingsPanel(): ReactElement {
         minLevel: next.loggingLevel,
         environment: next.loggingLevel === "debug" ? "development" : "production",
       });
-      setMessage("Settings saved.");
+      setMessage(t("settings.saved"));
     } catch (cause) {
       setError(toUserMessage(cause));
     }
@@ -89,22 +91,22 @@ export function SettingsPanel(): ReactElement {
   if (!settings) {
     return (
       <section>
-        <h1 className="mm-panel-title">Settings</h1>
-        <p className="mm-empty">Loading…</p>
+        <h1 className="mm-panel-title">{t("settings.title")}</h1>
+        <p className="mm-empty">{t("common.loading")}</p>
       </section>
     );
   }
 
   return (
     <section>
-      <h1 className="mm-panel-title">Settings</h1>
-      <p className="mm-panel-subtitle">Persistent preferences for MasterMotion.</p>
+      <h1 className="mm-panel-title">{t("settings.title")}</h1>
+      <p className="mm-panel-subtitle">{t("settings.subtitle")}</p>
       {error ? <Banner tone="error">{error}</Banner> : null}
       {message ? <Banner tone="info">{message}</Banner> : null}
 
       <div className="mm-card">
         <label className="mm-field">
-          <span>Theme</span>
+          <span>{t("settings.theme")}</span>
           <select
             value={settings.theme}
             onChange={(e) => void save({ theme: e.target.value as PluginSettings["theme"] })}
@@ -114,10 +116,17 @@ export function SettingsPanel(): ReactElement {
           </select>
         </label>
         <label className="mm-field">
-          <span>Language</span>
+          <span>{t("settings.language")}</span>
           <select
             value={settings.language}
-            onChange={(e) => void save({ language: e.target.value as PluginSettings["language"] })}
+            onChange={(e) => {
+              const lang = e.target.value as PluginSettings["language"];
+              void setLocale(lang).then(async () => {
+                const next = await settingsService.load();
+                setSettings(next);
+                setMessage(t("settings.saved"));
+              });
+            }}
           >
             <option value="en">English</option>
             <option value="fr">Français</option>
@@ -162,6 +171,37 @@ export function SettingsPanel(): ReactElement {
             <option value="error">error</option>
           </select>
         </label>
+      </div>
+
+      <div className="mm-card" style={{ marginTop: 12 }}>
+        <h2 className="mm-card__title">IA (WP12)</h2>
+        <p className="mm-muted">
+          Désactivée par défaut. Consentement et fournisseur se gèrent dans le panneau{" "}
+          <strong>AI</strong>. La clé API n’est jamais stockée dans ces réglages exportables.
+        </p>
+        <div className="mm-row">
+          <span className="mm-row__label">État</span>
+          <span className="mm-row__value">
+            {settings.ai.enabled ? "activée" : "off"} · {settings.ai.providerId} · consent=
+            {settings.ai.consentGiven ? "oui" : "non"}
+          </span>
+        </div>
+      </div>
+
+      <div className="mm-card" style={{ marginTop: 12 }}>
+        <h2 className="mm-card__title">Raccourcis (WP11)</h2>
+        <label className="mm-field">
+          <span>Palette de commandes</span>
+          <input
+            value={settings.shortcuts["cmd.palette"] ?? "mod+k"}
+            onChange={(e) =>
+              void save({
+                shortcuts: { ...settings.shortcuts, "cmd.palette": e.target.value.trim() || "mod+k" },
+              })
+            }
+          />
+        </label>
+        <p className="mm-muted">mod = Ctrl (Windows) / Cmd (macOS). Défaut: mod+k</p>
       </div>
 
       <div className="mm-card" style={{ marginTop: 12 }}>

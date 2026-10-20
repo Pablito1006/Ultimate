@@ -11,6 +11,12 @@ Write-Host "========================================"
 Write-Host " MasterMotion - Installation"
 Write-Host "========================================"
 Write-Host ""
+Write-Host "AVERTISSEMENT - INSTALLEUR NON OFFICIEL" -ForegroundColor Yellow
+Write-Host "  Ce script copie le plugin dans le dossier UXP External (sideload)."
+Write-Host "  Ce n est PAS une distribution Adobe signee / Marketplace."
+Write-Host "  Preferer un .ccx signe via Adobe Developer Distribution."
+Write-Host "  Voir docs/install/README.md et docs/distribution/signing.md"
+Write-Host ""
 
 if (-not (Test-Path $CcxPath)) {
   Write-Host "[ERREUR] Fichier introuvable :" -ForegroundColor Red
